@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>游戏集合</title>
     <!-- Tailwind CSS -->
-    <link href="./dist/output.css" rel="stylesheet">
+   <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
     
@@ -39,11 +40,28 @@
             }
         }
     </style>
+     <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#f67c5f',
+                        secondary: '#f5b461',
+                        accent: '#69db7c',
+                        background: '#faf8ef',
+                    },
+                    fontFamily: {
+                        sans: ['Clear Sans', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
 </head>
 <body class="bg-background min-h-screen font-sans text-gray-800 flex flex-col items-center justify-center p-4">
     <div class="max-w-md w-full mx-auto">
         <header class="text-center mb-8">
-            <h1 class="text-5xl font-bold text-gray-800 mb-2">游戏集合</h1>
+            <h1 class="text-5xl font-bold text-gray-800 mb-2">H5游戏集合</h1>
             <p class="text-gray-600">选择一个游戏开始游玩</p>
         </header>
         
