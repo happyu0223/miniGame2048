@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>游戏集合</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#f67c5f',
+                        secondary: '#f5b461',
+                        accent: '#69db7c',
+                        background: '#faf8ef',
+                    },
+                    fontFamily: {
+                        sans: ['Clear Sans', 'Helvetica Neue', 'Arial', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .btn-3d {
+                position: relative;
+                transition: all 0.2s ease;
+                transform-style: preserve-3d;
+            }
+            
+            .btn-3d:before {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                left: 0;
+                top: 0;
+                background: rgba(0,0,0,0.1);
+                transform: translateZ(-1px) scale(0.9);
+                filter: blur(10px);
+                border-radius: inherit;
+            }
+            
+            .btn-3d:active {
+                transform: translateY(4px);
+            }
+            
+            .btn-3d:active:before {
+                transform: translateZ(-1px) scale(0.85);
+            }
+        }
+    </style>
+</head>
+<body class="bg-background min-h-screen font-sans text-gray-800 flex flex-col items-center justify-center p-4">
+    <div class="max-w-md w-full mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-5xl font-bold text-gray-800 mb-2">游戏集合</h1>
+            <p class="text-gray-600">选择一个游戏开始游玩</p>
+        </header>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-center">游戏菜单</h2>
+            <div class="space-y-4">
+                <!-- 2048游戏链接 -->
+                <div class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                    <div class="text-4xl mr-4 text-blue-600">
+                        <i class="fa fa-cubes"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold">2048 游戏</h3>
+                        <p class="text-gray-600">合并数字方块，挑战高分！</p>
+                    </div>
+                    <a href="2048.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg btn-3d transition-all">
+                        开始游戏
+                    </a>
+                </div>
+                
+                <!-- 可以在这里添加更多游戏链接 -->
+            </div>
+        </div>
+        
+        <footer class="mt-8 text-center text-sm text-gray-600">
+            <p>© 2024 游戏集合 | 使用 Tailwind CSS 构建</p>
+        </footer>
+    </div>
+</body>
+</html>
