@@ -1,0 +1,1788 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>狼人杀 - 全新版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.544.0/dist/umd/lucide.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Ma+Shan+Zheng&display=swap');
+
+        :root {
+            --primary-dark: #1a1a1a;
+            --primary: #4a4a4a;
+            --primary-light: #6a6a6a;
+            --secondary: #8b4513;
+            --accent: #cc0000;
+            --background: #0a0a0a;
+            --text-light: #d0d0d0;
+            --text-gold: #cc0000;
+            --shadow-dark: rgba(0, 0, 0, 0.8);
+            --shadow-accent: rgba(204, 0, 0, 0.3);
+        }
+
+        body {
+            background-color: var(--background);
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            color: var(--text-light);
+            font-family: 'Noto Sans SC', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            min-height: 100vh;
+            border: 1px solid rgba(184, 134, 11, 0.2);
+        }
+
+        .title-font {
+            font-family: 'Ma Shan Zheng', cursive;
+            font-weight: normal;
+            text-shadow: 2px 2px 4px var(--shadow-dark), 0 0 20px var(--shadow-accent);
+            letter-spacing: 2px;
+        }
+
+        .dialogue-font {
+            font-family: 'Noto Sans SC', sans-serif;
+            font-weight: 500;
+        }
+
+        .role-werewolf { color: #ff4444; text-shadow: 0 0 10px #ff4444; }
+        .role-seer { color: #44ffff; text-shadow: 0 0 10px #44ffff; }
+        .role-witch { color: #ff44ff; text-shadow: 0 0 10px #ff44ff; }
+        .role-hunter { color: #ffa500; text-shadow: 0 0 10px #ffa500; }
+        .role-idiot { color: #ffff44; text-shadow: 0 0 10px #ffff44; }
+        .role-villager { color: #44ff44; text-shadow: 0 0 10px #44ff44; }
+
+        .player-avatar {
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .player-avatar:hover:not(.dead) {
+            transform: translateY(-10px) scale(1.1);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.5);
+        }
+
+        .player-avatar.dead {
+            filter: grayscale(100%) sepia(50%);
+            opacity: 0.5;
+        }
+
+        .avatar-frame {
+            border: 3px solid var(--accent);
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        .avatar-frame.dead {
+            border-color: #666;
+            box-shadow: none;
+        }
+
+        .vote-count {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 3px solid white;
+            z-index: 9999; /* 设置为最高层级 */
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+            font-size: 16px;
+            pointer-events: none; /* 避免遮挡点击 */
+        }
+
+        .vote-count-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--secondary);
+            color: white;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 2px solid white;
+            z-index: 5;
+            font-size: 1rem;
+        }
+
+        .avatar-frame {
+            position: relative;
+            z-index: 1;
+        }
+
+        .timer-container {
+            width: 100%;
+            height: 8px;
+            background-color: #333;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            transition: width 1s linear;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--accent);
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* 公屏区域限制高度并启用滚轮滚动 */
+        #chat-area {
+            max-height: 500px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        /* 自定义滚动条样式 */
+        #chat-area::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chat-area::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        #chat-area::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        #chat-area::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary);
+        }
+
+        .chat-message.system {
+            background: rgba(218, 165, 32, 0.2);
+            border-left-color: var(--accent);
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .chat-message.private {
+            background: rgba(128, 128, 128, 0.2);
+            font-style: italic;
+            border-left-color: #888;
+        }
+
+        .action-button {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, var(--primary-dark), var(--primary));
+            border: 2px solid var(--accent);
+            box-shadow: 
+                0 4px 8px var(--shadow-dark),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            text-shadow: 1px 1px 2px var(--shadow-dark);
+        }
+
+        .action-button.selected {
+            background: linear-gradient(145deg, #2a0a0a, #4a1a1a);
+            border-color: #cc0000;
+            transform: translateY(2px);
+            box-shadow: 
+                0 2px 4px var(--shadow-dark),
+                inset 0 1px 0 rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(204, 0, 0, 0.3);
+        }
+
+        .action-button.selected::after {
+            content: '✕';
+            position: absolute;
+            top: 50%;
+            right: 20px;
+            transform: translateY(-50%);
+            color: #cc0000;
+            font-size: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(204, 0, 0, 0.8);
+        }
+
+        .action-button.claw-effect::before {
+            content: '🩸';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            color: #cc0000;
+            opacity: 0;
+            animation: clawMark 0.6s ease-out;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .action-button:hover {
+            background: linear-gradient(145deg, var(--primary), var(--primary-light));
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 12px var(--shadow-dark),
+                0 0 20px var(--shadow-accent),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        .action-button:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 2px 4px var(--shadow-dark),
+                inset 0 1px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .action-button:hover::before {
+            left: 100%;
+        }
+
+        .phase-indicator {
+            animation: pulse 2s infinite;
+            text-shadow: 0 0 20px var(--text-gold);
+        }
+
+        .chat-area {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .status-bar {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .action-area {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(184, 134, 11, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .timer-bar {
+            background: linear-gradient(90deg, var(--accent), var(--secondary));
+            box-shadow: 0 0 15px var(--shadow-accent);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { 
+                text-shadow: 0 0 20px #cc0000;
+            }
+            50% { 
+                text-shadow: 0 0 30px #cc0000, 0 0 40px rgba(204, 0, 0, 0.5);
+            }
+        }
+
+        @keyframes clawMark {
+            0% { 
+                opacity: 0; 
+                transform: scale(0.5) rotate(-10deg);
+            }
+            50% { 
+                opacity: 1; 
+                transform: scale(1) rotate(0deg);
+            }
+            100% { 
+                opacity: 0; 
+                transform: scale(1.2) rotate(10deg);
+            }
+        }
+
+        .fog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(212, 175, 55, 0.03)" fill-opacity="1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,128C672,128,768,160,864,165.3C960,171,1056,149,1152,138.7C1248,128,1344,128,1392,128L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            animation: float 20s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+            animation: fogMove 60s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes fogMove {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-1440px); }
+        }
+
+        /* 玻璃态效果 */
+        .glass-morphism {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(218, 165, 32, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+    </style>
+</head>
+<body>
+    <div class="fog"></div>
+
+    <div class="game-container min-h-screen flex flex-col items-center justify-center p-4">
+        <!-- Menu Screen -->
+        <div id="menu-screen" class="w-full max-w-4xl glass-morphism rounded-lg p-8 border-4 border-[var(--text-gold)] shadow-[0_0_30px_rgba(204,0,0,0.5)] relative">
+            <button id="changelog-btn" class="absolute top-4 right-4 px-4 py-2 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-light)] rounded-lg action-button text-sm border-2 border-[#cc0000] overflow-visible z-10">更新日志</button>
+            <div id="developer-mode-toggle" class="absolute top-16 right-4 px-4 py-2 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-light)] rounded-lg action-button text-sm border-2 border-[#cc0000] overflow-visible z-10 cursor-pointer">
+                <span>开发者模式</span>
+            </div>
+            <h1 class="text-6xl md:text-8xl font-bold text-center title-font text-[var(--text-gold)] mb-2 animate-[glow_3s_ease-in-out_infinite,float_6s_ease-in-out_infinite]">狼人杀</h1>
+            <h2 class="text-2xl md:text-4xl font-bold text-center title-font text-[var(--text-gold)] mb-8 animate-[glow_3s_ease-in-out_infinite,float_6s_ease-in-out_infinite_0.5s]">Werewolf Game</h2>
+            <div class="flex flex-col items-center space-y-8">
+                <div class="text-center">
+                    <p class="text-2xl mb-6 title-font text-[var(--text-gold)] animate-[glow_3s_ease-in-out_infinite]">选择游戏人数</p>
+                    <div id="player-count-options" class="flex flex-col items-center space-y-4">
+                        <div class="text-center">
+                            <button data-count="6" class="px-8 py-4 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-light)] rounded-lg action-button text-xl border-2 border-[#cc0000]">
+                                6人局
+                            </button>
+                            <div class="mt-2 text-[var(--text-light)] text-sm">
+                                🐺×2 🔮×1 🌿×1 🧑‍🌾×2
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button data-count="9" class="px-8 py-4 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-light)] rounded-lg action-button text-xl border-2 border-[#cc0000]">
+                                9人局
+                            </button>
+                            <div class="mt-2 text-[var(--text-light)] text-sm">
+                                🐺×3 🔮×1 🌿×1 🔫×1 🧑‍🌾×3
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <button data-count="12" class="px-8 py-4 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-light)] rounded-lg action-button text-xl border-2 border-[#cc0000]">
+                                12人局
+                            </button>
+                            <div class="mt-2 text-[var(--text-light)] text-sm">
+                                🐺×4 🔮×1 🌿×1 🔫×1 😍×1 🧑‍🌾×4
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full flex justify-center space-x-6">
+                    <button id="start-game-btn" class="px-10 py-5 bg-[var(--secondary)] text-white font-bold rounded-lg action-button text-2xl border-2 border-[#cc0000] disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        开始游戏
+                    </button>
+                    <button id="rules-btn" class="px-10 py-5 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-light)] rounded-lg action-button text-2xl border-2 border-[#cc0000]">
+                        规则介绍
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="w-full max-w-6xl hidden">
+            <!-- Time Bar -->
+            <div id="time-bar" class="w-full text-center py-4 glass-morphism rounded-lg mb-6 border-2 border-[var(--accent)]">
+                <p class="text-2xl font-bold">第 <span id="day-counter">1</span> 天 · <span id="day-night">夜晚</span> <span id="phase-indicator" class="phase-indicator"></span></p>
+                <div class="timer-container">
+                    <div id="timer-bar" class="timer-bar w-full"></div>
+                </div>
+            </div>
+
+            <!-- Player Avatars -->
+            <div id="status-bar" class="w-full flex justify-center flex-wrap gap-6 mb-8">
+                <!-- Player avatars will be injected here -->
+            </div>
+
+            <!-- Main Game Area -->
+            <div id="main-area" class="w-full flex flex-col lg:flex-row gap-6">
+                <!-- Chat Area -->
+                <div id="chat-area" class="flex-1 h-[500px] glass-morphism rounded-lg p-6 overflow-y-auto border-2 border-[var(--accent)]">
+                    <!-- Chat messages will be injected here -->
+                </div>
+
+                <!-- Action Area -->
+                <div id="action-area" class="w-full lg:w-1/3 glass-morphism rounded-lg p-6 border-2 border-[var(--accent)]">
+                    <!-- Action buttons will be injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Rules Modal -->
+        <div id="rules-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+            <div class="glass-morphism rounded-lg p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto border-4 border-[var(--accent)]">
+                <h2 class="text-3xl font-bold text-[var(--text-gold)] mb-6 title-font">游戏规则</h2>
+                <div id="rules-content" class="dialogue-font text-lg space-y-4">
+                    <!-- Rules content will be injected here -->
+                </div>
+                <button id="close-rules-btn" class="mt-8 px-8 py-3 bg-[var(--secondary)] rounded-lg action-button text-xl border-2 border-[var(--accent)]">关闭</button>
+            </div>
+        </div>
+        
+        <!-- Changelog Modal -->
+        <div id="changelog-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+            <div class="glass-morphism rounded-lg p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto border-4 border-[var(--accent)]">
+                <h2 class="text-3xl font-bold text-[var(--text-gold)] mb-6 title-font">更新日志</h2>
+                <div id="changelog-content" class="dialogue-font text-lg space-y-4">
+                    <!-- Changelog content will be injected here -->
+                </div>
+                <button id="close-changelog-btn" class="mt-8 px-8 py-3 bg-[var(--secondary)] rounded-lg action-button text-xl border-2 border-[var(--accent)]">关闭</button>
+            </div>
+        </div>
+        
+        <!-- Game Over Modal -->
+        <div id="game-over-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+            <div class="glass-morphism rounded-lg p-8 max-w-3xl w-full max-h-[80vh] overflow-y-auto border-4 border-[var(--accent)]">
+                <h2 class="text-4xl font-bold text-[var(--text-gold)] mb-6 title-font">游戏结束</h2>
+                <p id="game-over-message" class="text-3xl mb-8 dialogue-font text-center"></p>
+                <div id="stats-container" class="mb-8 dialogue-font">
+                    <!-- Stats will be injected here -->
+                </div>
+                <button id="game-statistics-btn" class="w-full py-4 mb-4 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-light)] rounded-lg action-button text-2xl border-2 border-[var(--accent)]">本局统计</button>
+                <button id="back-to-menu-btn" class="w-full py-4 bg-[var(--secondary)] rounded-lg action-button text-2xl border-2 border-[var(--accent)]">返回主菜单</button>
+            </div>
+        </div>
+
+        <!-- Game Statistics Modal -->
+        <div id="game-statistics-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+            <div class="glass-morphism rounded-lg p-8 max-w-4xl w-full max-h-[80vh] overflow-y-auto border-4 border-[var(--accent)]">
+                <h2 class="text-4xl font-bold text-[var(--text-gold)] mb-6 title-font">本局统计</h2>
+                <div id="statistics-content" class="dialogue-font text-lg space-y-6">
+                    <!-- Statistics content will be injected here -->
+                </div>
+                <button id="close-statistics-btn" class="mt-8 w-full py-4 bg-[var(--secondary)] rounded-lg action-button text-2xl border-2 border-[var(--accent)]">关闭</button>
+            </div>
+        </div>
+
+        <!-- Voting Modal -->
+        <div id="voting-modal" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 hidden">
+            <div class="glass-morphism rounded-lg p-6 max-w-3xl w-full max-h-[80vh] border-4 border-[var(--accent)] flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-2xl font-bold title-font text-[var(--text-gold)]">投票阶段</h3>
+                    <button id="close-voting-btn" class="px-4 py-2 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-[var(--text-light)] rounded-lg action-button border-2 border-[var(--accent)]">关闭</button>
+                </div>
+                <p class="text-xl mb-6 dialogue-font">请选择你要投票的玩家：</p>
+                <div id="voting-options" class="flex flex-wrap justify-center gap-6 mb-6">
+                    <!-- Voting options will be injected here -->
+                </div>
+                <div class="mt-auto">
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="text-lg dialogue-font">剩余时间：<span id="voting-timer">30</span>秒</p>
+                        <p class="text-lg dialogue-font">当前票数：<span id="current-votes">0</span>/<span id="total-players">0</span></p>
+                    </div>
+                    <button id="submit-vote-btn" class="w-full py-4 bg-[var(--secondary)] text-white font-bold rounded-lg action-button text-xl border-2 border-[var(--accent)] disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        提交投票
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Game state
+            const gameState = {
+                playerCount: null,
+                players: [],
+                currentPlayerIndex: 0,
+                day: 1,
+                isDay: false,
+                phase: 'night',
+                phaseTimer: null,
+                phaseDuration: 60, // seconds
+                votes: {},
+                gameStarted: false,
+                developerMode: false,
+                statistics: {
+                    totalDays: 0,
+                    votesCast: 0,
+                    abilitiesUsed: 0,
+                    playersKilled: 0,
+                    wolvesKilled: 0,
+                    villagersKilled: 0
+                }
+            };
+
+            // DOM Elements
+            const menuScreen = document.getElementById('menu-screen');
+            const gameScreen = document.getElementById('game-screen');
+            const startGameBtn = document.getElementById('start-game-btn');
+            const rulesBtn = document.getElementById('rules-btn');
+            const rulesModal = document.getElementById('rules-modal');
+            const closeRulesBtn = document.getElementById('close-rules-btn');
+            const changelogBtn = document.getElementById('changelog-btn');
+            const changelogModal = document.getElementById('changelog-modal');
+            const closeChangelogBtn = document.getElementById('close-changelog-btn');
+            const gameOverModal = document.getElementById('game-over-modal');
+            const gameOverMessage = document.getElementById('game-over-message');
+            const statsContainer = document.getElementById('stats-container');
+            const gameStatisticsBtn = document.getElementById('game-statistics-btn');
+            const backToMenuBtn = document.getElementById('back-to-menu-btn');
+            const gameStatisticsModal = document.getElementById('game-statistics-modal');
+            const statisticsContent = document.getElementById('statistics-content');
+            const closeStatisticsBtn = document.getElementById('close-statistics-btn');
+            const votingModal = document.getElementById('voting-modal');
+            const closeVotingBtn = document.getElementById('close-voting-btn');
+            const votingOptions = document.getElementById('voting-options');
+            const votingTimer = document.getElementById('voting-timer');
+            const currentVotes = document.getElementById('current-votes');
+            const totalPlayers = document.getElementById('total-players');
+            const submitVoteBtn = document.getElementById('submit-vote-btn');
+            const developerModeToggle = document.getElementById('developer-mode-toggle');
+            const playerCountOptions = document.getElementById('player-count-options');
+            const statusBar = document.getElementById('status-bar');
+            const chatArea = document.getElementById('chat-area');
+            const actionArea = document.getElementById('action-area');
+            const dayCounter = document.getElementById('day-counter');
+            const dayNight = document.getElementById('day-night');
+            const phaseIndicator = document.getElementById('phase-indicator');
+            const timerBar = document.getElementById('timer-bar');
+
+            // Player roles
+            const roles = {
+                werewolf: { name: '狼人', icon: '🐺', color: 'role-werewolf', description: '每晚可以杀死一名玩家' },
+                seer: { name: '预言家', icon: '🔮', color: 'role-seer', description: '每晚可以查验一名玩家的身份' },
+                witch: { name: '女巫', icon: '🌿', color: 'role-witch', description: '拥有一瓶解药和一瓶毒药' },
+                hunter: { name: '猎人', icon: '🔫', color: 'role-hunter', description: '死亡时可以开枪带走一名玩家' },
+                idiot: { name: '白痴', icon: '😍', color: 'role-idiot', description: '被放逐时不会立即死亡' },
+                villager: { name: '村民', icon: '🧑‍🌾', color: 'role-villager', description: '没有特殊能力' }
+            };
+
+            // Game configuration based on player count
+            const gameConfig = {
+                6: {
+                    roles: [
+                        { role: 'werewolf', count: 2 },
+                        { role: 'seer', count: 1 },
+                        { role: 'witch', count: 1 },
+                        { role: 'villager', count: 2 }
+                    ],
+                    phaseDuration: {
+                        night: 60,
+                        discussion: 120,
+                        voting: 60
+                    }
+                },
+                9: {
+                    roles: [
+                        { role: 'werewolf', count: 3 },
+                        { role: 'seer', count: 1 },
+                        { role: 'witch', count: 1 },
+                        { role: 'hunter', count: 1 },
+                        { role: 'villager', count: 3 }
+                    ],
+                    phaseDuration: {
+                        night: 90,
+                        discussion: 180,
+                        voting: 90
+                    }
+                },
+                12: {
+                    roles: [
+                        { role: 'werewolf', count: 4 },
+                        { role: 'seer', count: 1 },
+                        { role: 'witch', count: 1 },
+                        { role: 'hunter', count: 1 },
+                        { role: 'idiot', count: 1 },
+                        { role: 'villager', count: 4 }
+                    ],
+                    phaseDuration: {
+                        night: 120,
+                        discussion: 240,
+                        voting: 120
+                    }
+                }
+            };
+
+            // Initialize the game
+            function init() {
+                // Set up event listeners
+                setupEventListeners();
+                
+                // Load rules and changelog
+                loadRules();
+                loadChangelog();
+                
+                // Add glass morphism class to elements
+                document.querySelectorAll('.game-container > div').forEach(el => {
+                    if (!el.classList.contains('glass-morphism')) {
+                        el.classList.add('glass-morphism');
+                    }
+                });
+            }
+
+            // Set up event listeners
+            function setupEventListeners() {
+                // Player count selection
+                playerCountOptions.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON') {
+                        // Remove selected class from all buttons
+                        playerCountOptions.querySelectorAll('button').forEach(btn => {
+                            btn.classList.remove('selected');
+                        });
+                        
+                        // Add selected class to clicked button
+                        e.target.classList.add('selected');
+                        
+                        // Set player count
+                        gameState.playerCount = parseInt(e.target.dataset.count);
+                        
+                        // Enable start game button
+                        startGameBtn.disabled = false;
+                    }
+                });
+
+                // Start game button
+                startGameBtn.addEventListener('click', startGame);
+
+                // Rules button
+                rulesBtn.addEventListener('click', () => {
+                    rulesModal.classList.remove('hidden');
+                });
+
+                // Close rules button
+                closeRulesBtn.addEventListener('click', () => {
+                    rulesModal.classList.add('hidden');
+                });
+
+                // Changelog button
+                changelogBtn.addEventListener('click', () => {
+                    changelogModal.classList.remove('hidden');
+                });
+
+                // Close changelog button
+                closeChangelogBtn.addEventListener('click', () => {
+                    changelogModal.classList.add('hidden');
+                });
+
+                // Game statistics button
+                gameStatisticsBtn.addEventListener('click', () => {
+                    gameOverModal.classList.add('hidden');
+                    gameStatisticsModal.classList.remove('hidden');
+                    showGameStatistics();
+                });
+
+                // Back to menu button
+                backToMenuBtn.addEventListener('click', resetGame);
+
+                // Close statistics button
+                closeStatisticsBtn.addEventListener('click', () => {
+                    gameStatisticsModal.classList.add('hidden');
+                });
+
+                // Close voting button
+                closeVotingBtn.addEventListener('click', () => {
+                    votingModal.classList.add('hidden');
+                });
+
+                // Submit vote button
+                submitVoteBtn.addEventListener('click', submitVote);
+
+                // Developer mode toggle
+                developerModeToggle.addEventListener('click', () => {
+                    gameState.developerMode = !gameState.developerMode;
+                    developerModeToggle.querySelector('span').textContent = 
+                        gameState.developerMode ? '开发者模式 (开)' : '开发者模式';
+                    developerModeToggle.classList.toggle('selected', gameState.developerMode);
+                });
+
+                // Close modals when clicking outside
+                window.addEventListener('click', (e) => {
+                    if (e.target === rulesModal) rulesModal.classList.add('hidden');
+                    if (e.target === changelogModal) changelogModal.classList.add('hidden');
+                    if (e.target === gameOverModal) gameOverModal.classList.add('hidden');
+                    if (e.target === gameStatisticsModal) gameStatisticsModal.classList.add('hidden');
+                    if (e.target === votingModal) votingModal.classList.add('hidden');
+                });
+            }
+
+            // Load rules content
+            function loadRules() {
+                const rulesContent = document.getElementById('rules-content');
+                rulesContent.innerHTML = `
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-2xl font-bold text-[var(--text-gold)] mb-2">游戏目标</h3>
+                            <p>狼人阵营：杀死所有村民或神职人员。</p>
+                            <p>好人阵营：找出并放逐所有狼人。</p>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-2xl font-bold text-[var(--text-gold)] mb-2">角色介绍</h3>
+                            <div class="space-y-2">
+                                <p><span class="role-werewolf">🐺 狼人</span>：每晚可以杀死一名玩家。</p>
+                                <p><span class="role-seer">🔮 预言家</span>：每晚可以查验一名玩家的身份。</p>
+                                <p><span class="role-witch">🌿 女巫</span>：拥有一瓶解药和一瓶毒药，解药可以救起被狼人杀死的玩家，毒药可以毒死任意一名玩家。</p>
+                                <p><span class="role-hunter">🔫 猎人</span>：当猎人被狼人杀死或被村民放逐时，可以开枪带走一名玩家。</p>
+                                <p><span class="role-idiot">😍 白痴</span>：当白痴被村民放逐时，不会立即死亡，而是翻开身份牌，继续留在游戏中，但失去投票权。</p>
+                                <p><span class="role-villager">🧑‍🌾 村民</span>：没有特殊能力，只能通过白天的投票放逐狼人。</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-2xl font-bold text-[var(--text-gold)] mb-2">游戏流程</h3>
+                            <ol class="list-decimal list-inside space-y-2">
+                                <li>游戏开始时，每位玩家随机获得一个身份。</li>
+                                <li>夜晚阶段，狼人、预言家、女巫等角色依次行动。</li>
+                                <li>白天阶段，所有玩家进行讨论，然后投票放逐一名玩家。</li>
+                                <li>重复夜晚和白天阶段，直到某一阵营达成胜利条件。</li>
+                            </ol>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-2xl font-bold text-[var(--text-gold)] mb-2">胜利条件</h3>
+                            <p>狼人阵营胜利：当狼人数量大于或等于好人数量时。</p>
+                            <p>好人阵营胜利：当所有狼人都被放逐时。</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Load changelog content
+            function loadChangelog() {
+                const changelogContent = document.getElementById('changelog-content');
+                changelogContent.innerHTML = `
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-2xl font-bold text-[var(--text-gold)] mb-2">v1.0.0 (2024-01-07)</h3>
+                            <ul class="list-disc list-inside space-y-2">
+                                <li>全新狼人杀游戏上线！</li>
+                                <li>支持6人、9人、12人三种游戏模式。</li>
+                                <li>包含狼人、预言家、女巫、猎人、白痴、村民六种角色。</li>
+                                <li>实现了完整的游戏流程：夜晚行动、白天讨论、投票放逐。</li>
+                                <li>添加了精美的游戏界面和动画效果。</li>
+                                <li>支持开发者模式，可以查看更多游戏信息。</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Start the game
+            function startGame() {
+                // Hide menu screen and show game screen
+                menuScreen.classList.add('hidden');
+                gameScreen.classList.remove('hidden');
+                
+                // Initialize game state
+                gameState.players = [];
+                gameState.currentPlayerIndex = 0;
+                gameState.day = 1;
+                gameState.isDay = false;
+                gameState.phase = 'night';
+                gameState.votes = {};
+                gameState.gameStarted = true;
+                gameState.statistics = {
+                    totalDays: 0,
+                    votesCast: 0,
+                    abilitiesUsed: 0,
+                    playersKilled: 0,
+                    wolvesKilled: 0,
+                    villagersKilled: 0
+                };
+                
+                // Create players
+                createPlayers();
+                
+                // Update UI
+                updateGameUI();
+                
+                // Start game loop
+                startGameLoop();
+                
+                // Add system message
+                addChatMessage('系统', '游戏开始！请查看你的身份。', 'system');
+            }
+
+            // Create players based on selected player count
+            function createPlayers() {
+                const config = gameConfig[gameState.playerCount];
+                let rolePool = [];
+                
+                // Create role pool based on configuration
+                config.roles.forEach(roleConfig => {
+                    for (let i = 0; i < roleConfig.count; i++) {
+                        rolePool.push(roleConfig.role);
+                    }
+                });
+                
+                // Shuffle role pool
+                rolePool = shuffleArray(rolePool);
+                
+                // Create players
+                for (let i = 0; i < gameState.playerCount; i++) {
+                    const role = rolePool[i];
+                    gameState.players.push({
+                        id: i,
+                        name: `玩家${i + 1}`,
+                        role: role,
+                        isAlive: true,
+                        hasVoted: false,
+                        votesReceived: 0,
+                        abilities: initPlayerAbilities(role),
+                        chatColor: roles[role].color
+                    });
+                }
+                
+                // Set current player (for testing purposes, set to first player)
+                gameState.currentPlayerIndex = 0;
+            }
+
+            // Initialize player abilities based on role
+            function initPlayerAbilities(role) {
+                switch (role) {
+                    case 'witch':
+                        return {
+                            hasPotion: true,
+                            hasPoison: true
+                        };
+                    case 'seer':
+                        return {
+                            hasChecked: false
+                        };
+                    case 'hunter':
+                        return {
+                            hasShot: true
+                        };
+                    default:
+                        return {};
+                }
+            }
+
+            // Update game UI
+            function updateGameUI() {
+                // Update day counter and day/night indicator
+                dayCounter.textContent = gameState.day;
+                dayNight.textContent = gameState.isDay ? '白天' : '夜晚';
+                
+                // Update phase indicator
+                updatePhaseIndicator();
+                
+                // Update player avatars
+                updatePlayerAvatars();
+                
+                // Update action area based on current phase and player role
+                updateActionArea();
+                
+                // Update timer
+                updateTimer();
+            }
+
+            // Update phase indicator
+            function updatePhaseIndicator() {
+                let phaseText = '';
+                
+                if (!gameState.isDay) {
+                    phaseText = '夜晚行动中';
+                } else {
+                    if (gameState.phase === 'discussion') {
+                        phaseText = '讨论阶段';
+                    } else if (gameState.phase === 'voting') {
+                        phaseText = '投票阶段';
+                    }
+                }
+                
+                phaseIndicator.textContent = phaseText;
+            }
+
+            // Update player avatars
+            function updatePlayerAvatars() {
+                statusBar.innerHTML = '';
+                
+                gameState.players.forEach(player => {
+                    const avatarContainer = document.createElement('div');
+                    avatarContainer.className = `player-avatar ${player.isAlive ? '' : 'dead'} flex flex-col items-center`;
+                    avatarContainer.dataset.playerId = player.id;
+                    
+                    const avatarFrame = document.createElement('div');
+                    avatarFrame.className = `avatar-frame ${player.isAlive ? '' : 'dead'} w-20 h-20 flex items-center justify-center text-4xl mb-2`;
+                    
+                    // Show role icon if player is dead or in developer mode
+                    const showRole = !player.isAlive || gameState.developerMode || player.id === gameState.currentPlayerIndex;
+                    avatarFrame.innerHTML = showRole ? roles[player.role].icon : '❓';
+                    
+                    const playerName = document.createElement('div');
+                    playerName.className = `text-center ${player.isAlive ? '' : 'line-through'}`;
+                    playerName.textContent = player.name;
+                    
+                    // Add vote count if player has received votes
+                    if (player.votesReceived > 0) {
+                        const voteCount = document.createElement('div');
+                        voteCount.className = 'vote-count';
+                        voteCount.textContent = player.votesReceived;
+                        avatarContainer.appendChild(voteCount);
+                    }
+                    
+                    avatarContainer.appendChild(avatarFrame);
+                    avatarContainer.appendChild(playerName);
+                    
+                    // Add click event for player interaction
+                    if (player.isAlive) {
+                        avatarContainer.addEventListener('click', () => handlePlayerInteraction(player));
+                    }
+                    
+                    statusBar.appendChild(avatarContainer);
+                });
+            }
+
+            // Update action area based on current phase and player role
+            function updateActionArea() {
+                actionArea.innerHTML = '';
+                
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                
+                if (!gameState.isDay) {
+                    // Night phase
+                    if (currentPlayer.isAlive) {
+                        switch (currentPlayer.role) {
+                            case 'werewolf':
+                                addNightAction('选择要击杀的玩家', 'kill');
+                                break;
+                            case 'seer':
+                                addNightAction('选择要查验的玩家', 'check');
+                                break;
+                            case 'witch':
+                                addWitchActions();
+                                break;
+                            default:
+                                addPassAction();
+                                break;
+                        }
+                    } else {
+                        addPassAction();
+                    }
+                } else {
+                    // Day phase
+                    if (gameState.phase === 'discussion') {
+                        addDiscussionActions();
+                    } else if (gameState.phase === 'voting') {
+                        addVotingActions();
+                    }
+                }
+            }
+
+            // Add night action button
+            function addNightAction(text, actionType) {
+                const actionTitle = document.createElement('h3');
+                actionTitle.className = 'text-2xl font-bold text-[var(--text-gold)] mb-4 text-center';
+                actionTitle.textContent = text;
+                
+                const actionButtonsContainer = document.createElement('div');
+                actionButtonsContainer.className = 'flex flex-wrap justify-center gap-4';
+                
+                gameState.players.forEach(player => {
+                    if (player.isAlive && player.id !== gameState.currentPlayerIndex) {
+                        const actionButton = document.createElement('button');
+                        actionButton.className = 'action-button px-4 py-2 rounded-lg';
+                        actionButton.dataset.playerId = player.id;
+                        actionButton.dataset.actionType = actionType;
+                        
+                        // Show role icon if in developer mode
+                        const showRole = gameState.developerMode;
+                        actionButton.innerHTML = `${showRole ? roles[player.role].icon : '❓'} ${player.name}`;
+                        
+                        actionButton.addEventListener('click', () => handleNightAction(actionType, player.id));
+                        actionButtonsContainer.appendChild(actionButton);
+                    }
+                });
+                
+                actionArea.appendChild(actionTitle);
+                actionArea.appendChild(actionButtonsContainer);
+            }
+
+            // Add witch actions
+            function addWitchActions() {
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                const actionTitle = document.createElement('h3');
+                actionTitle.className = 'text-2xl font-bold text-[var(--text-gold)] mb-4 text-center';
+                actionTitle.textContent = '女巫行动';
+                
+                const actionInfo = document.createElement('div');
+                actionInfo.className = 'mb-6 text-center';
+                actionInfo.innerHTML = `
+                    <p class="mb-2">解药: ${currentPlayer.abilities.hasPotion ? '✅' : '❌'}</p>
+                    <p>毒药: ${currentPlayer.abilities.hasPoison ? '✅' : '❌'}</p>
+                `;
+                
+                const actionButtonsContainer = document.createElement('div');
+                actionButtonsContainer.className = 'flex flex-wrap justify-center gap-4';
+                
+                // Add pass button
+                const passButton = document.createElement('button');
+                passButton.className = 'action-button px-6 py-3 rounded-lg';
+                passButton.textContent = '跳过';
+                passButton.addEventListener('click', () => handleNightAction('pass', null));
+                actionButtonsContainer.appendChild(passButton);
+                
+                // Add save button if witch has potion
+                if (currentPlayer.abilities.hasPotion) {
+                    const saveButton = document.createElement('button');
+                    saveButton.className = 'action-button px-6 py-3 rounded-lg';
+                    saveButton.textContent = '使用解药';
+                    saveButton.addEventListener('click', () => handleNightAction('save', null));
+                    actionButtonsContainer.appendChild(saveButton);
+                }
+                
+                // Add poison button if witch has poison
+                if (currentPlayer.abilities.hasPoison) {
+                    const poisonTitle = document.createElement('p');
+                    poisonTitle.className = 'w-full text-center mt-4 mb-2';
+                    poisonTitle.textContent = '选择要毒杀的玩家:';
+                    actionButtonsContainer.appendChild(poisonTitle);
+                    
+                    gameState.players.forEach(player => {
+                        if (player.isAlive && player.id !== gameState.currentPlayerIndex) {
+                            const poisonButton = document.createElement('button');
+                            poisonButton.className = 'action-button px-4 py-2 rounded-lg';
+                            poisonButton.dataset.playerId = player.id;
+                            poisonButton.dataset.actionType = 'poison';
+                            
+                            // Show role icon if in developer mode
+                            const showRole = gameState.developerMode;
+                            poisonButton.innerHTML = `${showRole ? roles[player.role].icon : '❓'} ${player.name}`;
+                            
+                            poisonButton.addEventListener('click', () => handleNightAction('poison', player.id));
+                            actionButtonsContainer.appendChild(poisonButton);
+                        }
+                    });
+                }
+                
+                actionArea.appendChild(actionTitle);
+                actionArea.appendChild(actionInfo);
+                actionArea.appendChild(actionButtonsContainer);
+            }
+
+            // Add pass action
+            function addPassAction() {
+                const actionTitle = document.createElement('h3');
+                actionTitle.className = 'text-2xl font-bold text-[var(--text-gold)] mb-4 text-center';
+                actionTitle.textContent = '等待其他玩家行动...';
+                
+                const passButton = document.createElement('button');
+                passButton.className = 'action-button px-6 py-3 rounded-lg w-full';
+                passButton.textContent = '跳过';
+                passButton.addEventListener('click', () => {
+                    // In a real game, this would wait for all players, but for demo we just proceed
+                    proceedToNextPhase();
+                });
+                
+                actionArea.appendChild(actionTitle);
+                actionArea.appendChild(passButton);
+            }
+
+            // Add discussion actions
+            function addDiscussionActions() {
+                const actionTitle = document.createElement('h3');
+                actionTitle.className = 'text-2xl font-bold text-[var(--text-gold)] mb-4 text-center';
+                actionTitle.textContent = '讨论阶段';
+                
+                const discussionInfo = document.createElement('div');
+                discussionInfo.className = 'mb-6 text-center';
+                discussionInfo.textContent = '请在聊天区域进行讨论。';
+                
+                const chatInputContainer = document.createElement('div');
+                chatInputContainer.className = 'flex gap-2';
+                
+                const chatInput = document.createElement('input');
+                chatInput.type = 'text';
+                chatInput.className = 'flex-1 px-4 py-2 rounded-lg bg-[var(--primary-dark)] text-[var(--text-light)] border border-[var(--accent)]';
+                chatInput.placeholder = '输入讨论内容...';
+                
+                const sendButton = document.createElement('button');
+                sendButton.className = 'action-button px-4 py-2 rounded-lg';
+                sendButton.textContent = '发送';
+                sendButton.addEventListener('click', () => {
+                    if (chatInput.value.trim()) {
+                        sendChatMessage(chatInput.value.trim());
+                        chatInput.value = '';
+                    }
+                });
+                
+                // Add Enter key support
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        sendButton.click();
+                    }
+                });
+                
+                chatInputContainer.appendChild(chatInput);
+                chatInputContainer.appendChild(sendButton);
+                
+                actionArea.appendChild(actionTitle);
+                actionArea.appendChild(discussionInfo);
+                actionArea.appendChild(chatInputContainer);
+            }
+
+            // Add voting actions
+            function addVotingActions() {
+                const actionTitle = document.createElement('h3');
+                actionTitle.className = 'text-2xl font-bold text-[var(--text-gold)] mb-4 text-center';
+                actionTitle.textContent = '投票阶段';
+                
+                const votingInfo = document.createElement('div');
+                votingInfo.className = 'mb-6 text-center';
+                votingInfo.textContent = '请选择要投票放逐的玩家。';
+                
+                const voteButton = document.createElement('button');
+                voteButton.className = 'action-button px-6 py-3 rounded-lg w-full';
+                voteButton.textContent = '打开投票面板';
+                voteButton.addEventListener('click', openVotingPanel);
+                
+                actionArea.appendChild(actionTitle);
+                actionArea.appendChild(votingInfo);
+                actionArea.appendChild(voteButton);
+            }
+
+            // Update timer
+            function updateTimer() {
+                const config = gameConfig[gameState.playerCount];
+                let duration = config.phaseDuration.night;
+                
+                if (gameState.isDay) {
+                    duration = gameState.phase === 'discussion' 
+                        ? config.phaseDuration.discussion 
+                        : config.phaseDuration.voting;
+                }
+                
+                gameState.phaseDuration = duration;
+                gameState.remainingTime = duration;
+                
+                // Clear existing timer
+                if (gameState.phaseTimer) {
+                    clearInterval(gameState.phaseTimer);
+                }
+                
+                // Start new timer
+                gameState.phaseTimer = setInterval(() => {
+                    gameState.remainingTime--;
+                    updateTimerBar();
+                    
+                    if (gameState.remainingTime <= 0) {
+                        clearInterval(gameState.phaseTimer);
+                        proceedToNextPhase();
+                    }
+                }, 1000);
+                
+                updateTimerBar();
+            }
+
+            // Update timer bar
+            function updateTimerBar() {
+                const percentage = (gameState.remainingTime / gameState.phaseDuration) * 100;
+                timerBar.style.width = `${percentage}%`;
+            }
+
+            // Handle player interaction
+            function handlePlayerInteraction(player) {
+                // This function can be expanded for more complex interactions
+                console.log(`Player ${player.id} (${player.name}) clicked`);
+            }
+
+            // Handle night action
+            function handleNightAction(actionType, targetPlayerId) {
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                
+                switch (actionType) {
+                    case 'kill':
+                        // Handle werewolf kill
+                        addChatMessage('狼人', `选择击杀 ${gameState.players[targetPlayerId].name}`, 'private');
+                        gameState.statistics.abilitiesUsed++;
+                        gameState.statistics.playersKilled++;
+                        proceedToNextPhase();
+                        break;
+                        
+                    case 'check':
+                        // Handle seer check
+                        const targetPlayer = gameState.players[targetPlayerId];
+                        const isWolf = targetPlayer.role === 'werewolf';
+                        addChatMessage('预言家', `查验结果：${targetPlayer.name} ${isWolf ? '是狼人' : '不是狼人'}`, 'private');
+                        currentPlayer.abilities.hasChecked = true;
+                        gameState.statistics.abilitiesUsed++;
+                        proceedToNextPhase();
+                        break;
+                        
+                    case 'save':
+                        // Handle witch save
+                        addChatMessage('女巫', '使用了解药', 'private');
+                        currentPlayer.abilities.hasPotion = false;
+                        gameState.statistics.abilitiesUsed++;
+                        proceedToNextPhase();
+                        break;
+                        
+                    case 'poison':
+                        // Handle witch poison
+                        addChatMessage('女巫', `使用毒药毒杀 ${gameState.players[targetPlayerId].name}`, 'private');
+                        currentPlayer.abilities.hasPoison = false;
+                        gameState.statistics.abilitiesUsed++;
+                        gameState.statistics.playersKilled++;
+                        
+                        // Mark player to be killed by poison
+                        gameState.players[targetPlayerId].markedByPoison = true;
+                        
+                        proceedToNextPhase();
+                        break;
+                        
+                    case 'pass':
+                        // Handle pass action
+                        proceedToNextPhase();
+                        break;
+                }
+            }
+
+            // Proceed to next phase
+            function proceedToNextPhase() {
+                if (!gameState.isDay) {
+                    // Night phase -> Day phase
+                    resolveNightActions();
+                    gameState.isDay = true;
+                    gameState.phase = 'discussion';
+                    gameState.day++;
+                    gameState.statistics.totalDays++;
+                    
+                    // Check for game over after night actions
+                    if (checkGameOver()) {
+                        return;
+                    }
+                    
+                    addChatMessage('系统', `第 ${gameState.day} 天开始了！`, 'system');
+                } else {
+                    if (gameState.phase === 'discussion') {
+                        // Discussion phase -> Voting phase
+                        gameState.phase = 'voting';
+                        resetVotes();
+                        addChatMessage('系统', '讨论时间结束，开始投票！', 'system');
+                    } else {
+                        // Voting phase -> Night phase
+                        resolveVoting();
+                        gameState.isDay = false;
+                        gameState.phase = 'night';
+                        
+                        // Check for game over after voting
+                        if (checkGameOver()) {
+                            return;
+                        }
+                        
+                        addChatMessage('系统', '天黑请闭眼', 'system');
+                    }
+                }
+                
+                updateGameUI();
+            }
+
+            // Resolve night actions
+            function resolveNightActions() {
+                // In a real game, this would handle all night actions
+                // For demo purposes, we'll simulate some actions
+                
+                // Check for players marked by poison
+                gameState.players.forEach(player => {
+                    if (player.markedByPoison) {
+                        player.isAlive = false;
+                        addChatMessage('系统', `${player.name} 被女巫毒死了！`, 'system');
+                        
+                        // Check if player is a wolf
+                        if (player.role === 'werewolf') {
+                            gameState.statistics.wolvesKilled++;
+                        } else {
+                            gameState.statistics.villagersKilled++;
+                        }
+                        
+                        // Handle hunter ability
+                        if (player.role === 'hunter' && player.abilities.hasShot) {
+                            // In a real game, this would allow the hunter to choose a target
+                            // For demo purposes, we'll randomly select a target
+                            const alivePlayers = gameState.players.filter(p => p.isAlive && p.id !== player.id);
+                            if (alivePlayers.length > 0) {
+                                const targetIndex = Math.floor(Math.random() * alivePlayers.length);
+                                const targetPlayer = alivePlayers[targetIndex];
+                                
+                                targetPlayer.isAlive = false;
+                                addChatMessage('系统', `${player.name}（猎人）开枪带走了 ${targetPlayer.name}！`, 'system');
+                                
+                                // Check if target is a wolf
+                                if (targetPlayer.role === 'werewolf') {
+                                    gameState.statistics.wolvesKilled++;
+                                } else {
+                                    gameState.statistics.villagersKilled++;
+                                }
+                            }
+                        }
+                        
+                        // Handle idiot ability
+                        if (player.role === 'idiot') {
+                            player.isAlive = true; // Idiot doesn't die immediately
+                            addChatMessage('系统', `${player.name}（白痴）被放逐，但翻开身份牌继续留在游戏中！`, 'system');
+                        }
+                    }
+                });
+                
+                // Simulate werewolf kill (for demo)
+                const alivePlayers = gameState.players.filter(p => p.isAlive && p.role !== 'werewolf');
+                if (alivePlayers.length > 0) {
+                    const targetIndex = Math.floor(Math.random() * alivePlayers.length);
+                    const targetPlayer = alivePlayers[targetIndex];
+                    
+                    // Check if witch saved this player
+                    const witch = gameState.players.find(p => p.role === 'witch' && p.isAlive);
+                    const wasSaved = witch && !witch.abilities.hasPotion;
+                    
+                    if (!wasSaved) {
+                        targetPlayer.isAlive = false;
+                        addChatMessage('系统', `${targetPlayer.name} 被狼人杀死了！`, 'system');
+                        
+                        // Check if player is a wolf
+                        if (targetPlayer.role === 'werewolf') {
+                            gameState.statistics.wolvesKilled++;
+                        } else {
+                            gameState.statistics.villagersKilled++;
+                        }
+                        
+                        // Handle hunter ability
+                        if (targetPlayer.role === 'hunter' && targetPlayer.abilities.hasShot) {
+                            // In a real game, this would allow the hunter to choose a target
+                            // For demo purposes, we'll randomly select a target
+                            const alivePlayersAfterKill = gameState.players.filter(p => p.isAlive && p.id !== targetPlayer.id);
+                            if (alivePlayersAfterKill.length > 0) {
+                                const hunterTargetIndex = Math.floor(Math.random() * alivePlayersAfterKill.length);
+                                const hunterTargetPlayer = alivePlayersAfterKill[hunterTargetIndex];
+                                
+                                hunterTargetPlayer.isAlive = false;
+                                addChatMessage('系统', `${targetPlayer.name}（猎人）开枪带走了 ${hunterTargetPlayer.name}！`, 'system');
+                                
+                                // Check if target is a wolf
+                                if (hunterTargetPlayer.role === 'werewolf') {
+                                    gameState.statistics.wolvesKilled++;
+                                } else {
+                                    gameState.statistics.villagersKilled++;
+                                }
+                            }
+                        }
+                    } else {
+                        addChatMessage('系统', `女巫使用了解药，${targetPlayer.name} 被救了！`, 'system');
+                    }
+                }
+            }
+
+            // Reset votes for new voting phase
+            function resetVotes() {
+                gameState.players.forEach(player => {
+                    player.hasVoted = false;
+                    player.votesReceived = 0;
+                });
+                
+                gameState.votes = {};
+            }
+
+            // Resolve voting
+            function resolveVoting() {
+                // Find player with most votes
+                let maxVotes = 0;
+                let playersWithMaxVotes = [];
+                
+                gameState.players.forEach(player => {
+                    if (player.isAlive) {
+                        if (player.votesReceived > maxVotes) {
+                            maxVotes = player.votesReceived;
+                            playersWithMaxVotes = [player];
+                        } else if (player.votesReceived === maxVotes && maxVotes > 0) {
+                            playersWithMaxVotes.push(player);
+                        }
+                    }
+                });
+                
+                // Handle voting result
+                if (playersWithMaxVotes.length === 1) {
+                    const playerToLynch = playersWithMaxVotes[0];
+                    playerToLynch.isAlive = false;
+                    
+                    addChatMessage('系统', `${playerToLynch.name} 被放逐了！`, 'system');
+                    
+                    // Check if player is a wolf
+                    if (playerToLynch.role === 'werewolf') {
+                        gameState.statistics.wolvesKilled++;
+                    } else {
+                        gameState.statistics.villagersKilled++;
+                    }
+                    
+                    // Handle hunter ability
+                    if (playerToLynch.role === 'hunter' && playerToLynch.abilities.hasShot) {
+                        // In a real game, this would allow the hunter to choose a target
+                        // For demo purposes, we'll randomly select a target
+                        const alivePlayers = gameState.players.filter(p => p.isAlive && p.id !== playerToLynch.id);
+                        if (alivePlayers.length > 0) {
+                            const targetIndex = Math.floor(Math.random() * alivePlayers.length);
+                            const targetPlayer = alivePlayers[targetIndex];
+                            
+                            targetPlayer.isAlive = false;
+                            addChatMessage('系统', `${playerToLynch.name}（猎人）开枪带走了 ${targetPlayer.name}！`, 'system');
+                            
+                            // Check if target is a wolf
+                            if (targetPlayer.role === 'werewolf') {
+                                gameState.statistics.wolvesKilled++;
+                            } else {
+                                gameState.statistics.villagersKilled++;
+                            }
+                        }
+                    }
+                    
+                    // Handle idiot ability
+                    if (playerToLynch.role === 'idiot') {
+                        playerToLynch.isAlive = true; // Idiot doesn't die immediately
+                        addChatMessage('系统', `${playerToLynch.name}（白痴）被放逐，但翻开身份牌继续留在游戏中！`, 'system');
+                    }
+                } else if (playersWithMaxVotes.length > 1) {
+                    addChatMessage('系统', '投票结果平局，没有人被放逐。', 'system');
+                } else {
+                    addChatMessage('系统', '没有人获得投票，跳过放逐环节。', 'system');
+                }
+            }
+
+            // Check if game is over
+            function checkGameOver() {
+                const aliveWolves = gameState.players.filter(p => p.isAlive && p.role === 'werewolf').length;
+                const aliveVillagers = gameState.players.filter(p => p.isAlive && p.role !== 'werewolf').length;
+                
+                // Check victory conditions
+                if (aliveWolves === 0) {
+                    // Villagers win
+                    endGame('好人阵营胜利！所有狼人都被放逐了！');
+                    return true;
+                } else if (aliveWolves >= aliveVillagers) {
+                    // Werewolves win
+                    endGame('狼人阵营胜利！狼人数量已经超过或等于好人数量！');
+                    return true;
+                }
+                
+                return false;
+            }
+
+            // End the game
+            function endGame(message) {
+                // Stop the timer
+                if (gameState.phaseTimer) {
+                    clearInterval(gameState.phaseTimer);
+                }
+                
+                gameState.gameStarted = false;
+                gameOverMessage.textContent = message;
+                
+                // Update stats container
+                statsContainer.innerHTML = `
+                    <div class="space-y-4">
+                        <p>游戏天数: ${gameState.statistics.totalDays}</p>
+                        <p>总投票数: ${gameState.statistics.votesCast}</p>
+                        <p>技能使用次数: ${gameState.statistics.abilitiesUsed}</p>
+                        <p>死亡玩家数: ${gameState.statistics.playersKilled}</p>
+                        <p>被放逐狼人: ${gameState.statistics.wolvesKilled}</p>
+                        <p>被放逐村民: ${gameState.statistics.villagersKilled}</p>
+                    </div>
+                `;
+                
+                // Show game over modal
+                gameOverModal.classList.remove('hidden');
+            }
+
+            // Show game statistics
+            function showGameStatistics() {
+                statisticsContent.innerHTML = '';
+                
+                // Add game summary
+                const summarySection = document.createElement('div');
+                summarySection.innerHTML = `
+                    <h3 class="text-2xl font-bold text-[var(--text-gold)] mb-4">游戏总结</h3>
+                    <div class="space-y-2">
+                        <p>游戏天数: ${gameState.statistics.totalDays}</p>
+                        <p>总投票数: ${gameState.statistics.votesCast}</p>
+                        <p>技能使用次数: ${gameState.statistics.abilitiesUsed}</p>
+                        <p>死亡玩家数: ${gameState.statistics.playersKilled}</p>
+                        <p>被放逐狼人: ${gameState.statistics.wolvesKilled}</p>
+                        <p>被放逐村民: ${gameState.statistics.villagersKilled}</p>
+                    </div>
+                `;
+                statisticsContent.appendChild(summarySection);
+                
+                // Add player statistics
+                const playersSection = document.createElement('div');
+                playersSection.innerHTML = `<h3 class="text-2xl font-bold text-[var(--text-gold)] mb-4">玩家表现</h3>`;
+                
+                const playersList = document.createElement('div');
+                playersList.className = 'space-y-4';
+                
+                gameState.players.forEach(player => {
+                    const playerStats = document.createElement('div');
+                    playerStats.className = 'p-4 rounded-lg bg-[var(--primary-dark)]';
+                    
+                    const roleInfo = `${roles[player.role].icon} ${roles[player.role].name}`;
+                    const statusInfo = player.isAlive ? '存活' : '死亡';
+                    
+                    playerStats.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="${roles[player.role].color} font-bold">${player.name} (${roleInfo})</span>
+                            <span>${statusInfo}</span>
+                        </div>
+                    `;
+                    
+                    playersList.appendChild(playerStats);
+                });
+                
+                playersSection.appendChild(playersList);
+                statisticsContent.appendChild(playersSection);
+            }
+
+            // Open voting panel
+            function openVotingPanel() {
+                votingOptions.innerHTML = '';
+                
+                // Filter out dead players and current player
+                const eligiblePlayers = gameState.players.filter(p => p.isAlive);
+                
+                eligiblePlayers.forEach(player => {
+                    const voteOption = document.createElement('div');
+                    voteOption.className = 'player-avatar flex flex-col items-center cursor-pointer';
+                    voteOption.dataset.playerId = player.id;
+                    
+                    const avatarFrame = document.createElement('div');
+                    avatarFrame.className = 'avatar-frame w-16 h-16 flex items-center justify-center text-3xl mb-2';
+                    
+                    // Show role icon if player is dead or in developer mode
+                    const showRole = gameState.developerMode;
+                    avatarFrame.innerHTML = showRole ? roles[player.role].icon : '❓';
+                    
+                    const playerName = document.createElement('div');
+                    playerName.className = 'text-center';
+                    playerName.textContent = player.name;
+                    
+                    voteOption.appendChild(avatarFrame);
+                    voteOption.appendChild(playerName);
+                    
+                    // Add click event to select player
+                    voteOption.addEventListener('click', () => {
+                        // Remove selected class from all options
+                        votingOptions.querySelectorAll('.selected').forEach(el => {
+                            el.classList.remove('selected');
+                        });
+                        
+                        // Add selected class to clicked option
+                        voteOption.classList.add('selected');
+                        
+                        // Enable submit button
+                        submitVoteBtn.disabled = false;
+                    });
+                    
+                    votingOptions.appendChild(voteOption);
+                });
+                
+                // Update voting info
+                totalPlayers.textContent = gameState.players.filter(p => p.isAlive).length;
+                currentVotes.textContent = Object.keys(gameState.votes).length;
+                
+                // Reset voting timer
+                let votingTimeLeft = 30;
+                votingTimer.textContent = votingTimeLeft;
+                
+                const votingTimerInterval = setInterval(() => {
+                    votingTimeLeft--;
+                    votingTimer.textContent = votingTimeLeft;
+                    
+                    if (votingTimeLeft <= 0) {
+                        clearInterval(votingTimerInterval);
+                        
+                        // If no vote selected, randomly select one
+                        if (!votingOptions.querySelector('.selected') && eligiblePlayers.length > 0) {
+                            const randomIndex = Math.floor(Math.random() * eligiblePlayers.length);
+                            votingOptions.children[randomIndex].click();
+                        }
+                        
+                        // Submit vote if an option is selected
+                        if (!submitVoteBtn.disabled) {
+                            submitVote();
+                        } else {
+                            // Close modal if no vote selected
+                            votingModal.classList.add('hidden');
+                        }
+                    }
+                }, 1000);
+                
+                // Show voting modal
+                votingModal.classList.remove('hidden');
+                
+                // Reset submit button
+                submitVoteBtn.disabled = true;
+                
+                // Store timer interval to clear later
+                votingModal.dataset.timerInterval = votingTimerInterval;
+            }
+
+            // Submit vote
+            function submitVote() {
+                const selectedOption = votingOptions.querySelector('.selected');
+                
+                if (selectedOption) {
+                    const targetPlayerId = parseInt(selectedOption.dataset.playerId);
+                    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                    
+                    // Record vote
+                    gameState.votes[currentPlayer.id] = targetPlayerId;
+                    gameState.players[targetPlayerId].votesReceived++;
+                    currentPlayer.hasVoted = true;
+                    
+                    gameState.statistics.votesCast++;
+                    
+                    // Update current votes count
+                    currentVotes.textContent = Object.keys(gameState.votes).length;
+                    
+                    // Add chat message
+                    addChatMessage(currentPlayer.name, `投票给了 ${gameState.players[targetPlayerId].name}`, 'private');
+                    
+                    // Clear voting timer
+                    clearInterval(parseInt(votingModal.dataset.timerInterval));
+                    
+                    // Close voting modal
+                    votingModal.classList.add('hidden');
+                    
+                    // Update player avatars to show votes
+                    updatePlayerAvatars();
+                    
+                    // Check if all players have voted
+                    const alivePlayers = gameState.players.filter(p => p.isAlive);
+                    const votedPlayers = gameState.players.filter(p => p.hasVoted);
+                    
+                    if (alivePlayers.length === votedPlayers.length) {
+                        // All players have voted, proceed to next phase
+                        setTimeout(() => {
+                            proceedToNextPhase();
+                        }, 2000);
+                    }
+                }
+            }
+
+            // Send chat message
+            function sendChatMessage(content) {
+                const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                addChatMessage(currentPlayer.name, content, 'normal');
+            }
+
+            // Add chat message to chat area
+            function addChatMessage(sender, content, type = 'normal') {
+                const messageElement = document.createElement('div');
+                messageElement.className = `chat-message ${type}`;
+                
+                if (type === 'private') {
+                    messageElement.innerHTML = `<span class="font-bold">${sender}（私聊）:</span> ${content}`;
+                } else {
+                    const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+                    const senderObj = gameState.players.find(p => p.name === sender);
+                    const senderColor = senderObj ? senderObj.chatColor : '';
+                    
+                    messageElement.innerHTML = `<span class="font-bold ${sender === '系统' ? 'text-[var(--text-gold)]' : senderColor}">${sender}:</span> ${content}`;
+                }
+                
+                chatArea.appendChild(messageElement);
+                
+                // Scroll to bottom
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
+
+            // Start game loop
+            function startGameLoop() {
+                // In a real game, this would handle the game flow
+                // For demo purposes, we'll just update the UI
+                updateGameUI();
+            }
+
+            // Reset game
+            function resetGame() {
+                // Stop the timer
+                if (gameState.phaseTimer) {
+                    clearInterval(gameState.phaseTimer);
+                }
+                
+                // Hide game screens and show menu
+                gameScreen.classList.add('hidden');
+                gameOverModal.classList.add('hidden');
+                gameStatisticsModal.classList.add('hidden');
+                
+                menuScreen.classList.remove('hidden');
+                
+                // Reset game state
+                gameState.playerCount = null;
+                gameState.players = [];
+                gameState.currentPlayerIndex = 0;
+                gameState.day = 1;
+                gameState.isDay = false;
+                gameState.phase = 'night';
+                gameState.votes = {};
+                gameState.gameStarted = false;
+                
+                // Reset UI
+                playerCountOptions.querySelectorAll('button').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                
+                startGameBtn.disabled = true;
+                
+                // Clear chat area
+                chatArea.innerHTML = '';
+            }
+
+            // Utility function to shuffle array
+            function shuffleArray(array) {
+                const newArray = [...array];
+                for (let i = newArray.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+                }
+                return newArray;
+            }
+
+            // Initialize the game
+            init();
+        });
+    </script>
+</body>
+</html>
