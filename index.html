@@ -58,107 +58,319 @@
         }
     </script>
 </head>
-<body class="bg-background min-h-screen font-sans text-gray-800 flex flex-col items-center justify-center p-4">
-    <div class="max-w-md w-full mx-auto">
-        <header class="text-center mb-8">
-            <h1 class="text-5xl font-bold text-gray-800 mb-2">H5游戏集合</h1>
-            <p class="text-gray-600">选择一个游戏开始游玩</p>
-        </header>
-        
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <h2 class="text-2xl font-bold mb-4 text-center">游戏菜单</h2>
-            <div class="space-y-4">
-                <!-- 2048游戏链接 -->
-                <div class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                    <div class="text-4xl mr-4 text-blue-600">
-                        <i class="fa fa-cubes"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold">2048 游戏</h3>
-                        <p class="text-gray-600">合并数字方块，挑战高分！</p>
-                    </div>
-                    <a href="2048.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg btn-3d transition-all">
-                        开始游戏
-                    </a>
-                </div>
-                
-                <!-- 狼人杀游戏链接 -->
-                <div class="flex items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                    <div class="text-4xl mr-4 text-purple-600">
-                        <i class="fa fa-users"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold">狼人杀</h3>
-                        <p class="text-gray-600">推理与欺骗的社交游戏！</p>
-                    </div>
-                    <a href="liangrensha.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg btn-3d transition-all">
-                        开始游戏
-                    </a>
-                </div>
+<body class="bg-background min-h-screen font-sans text-gray-800 flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+            <h1 class="text-3xl font-bold text-gray-800">H5多功能平台</h1>
+            <p class="text-gray-600 mt-1">集成多种实用工具和娱乐游戏</p>
+        </div>
+    </header>
 
-                <!-- 废弃医院恐怖游戏链接 -->
-                <div class="flex items-center p-4 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
-                    <div class="text-4xl mr-4 text-red-600">
-                        <i class="fa fa-hospital-o"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold">废弃医院</h3>
-                        <p class="text-gray-600">探索恐怖的废弃医院，寻找逃离的方法！</p>
-                    </div>
-                    <a href="feiqiyiyuan.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg btn-3d transition-all">
-                        开始游戏
-                    </a>
-                </div>
-
-                <!-- 像素飞机大战游戏链接 -->
-                <div class="flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                    <div class="text-4xl mr-4 text-blue-600">
-                        <i class="fa fa-plane"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold">像素飞机大战</h3>
-                        <p class="text-gray-600">经典街机射击游戏，驾驶飞机击败敌机，收集道具！</p>
-                    </div>
-                    <a href="xiangsufeijidazhan.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg btn-3d transition-all">
-                        开始游戏
-                    </a>
-                </div>
-
-                <!-- 台球游戏增强版链接 -->
-                <div class="flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
-                    <div class="text-4xl mr-4 text-green-600">
-                        <i class="fa fa-circle"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold">台球游戏增强版</h3>
-                        <p class="text-gray-600">经典台球游戏，双人轮流击球，争夺花色球的胜利！</p>
-                    </div>
-                    <a href="taiqiu.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg btn-3d transition-all">
-                        开始游戏
-                    </a>
-                </div>
-
-                <!-- 斗地主游戏链接 -->
-                <div class="flex items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
-                    <div class="text-4xl mr-4 text-orange-600">
-                        <i class="fa fa-clone"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold">斗地主</h3>
-                        <p class="text-gray-600">经典斗地主游戏，与AI对手争夺地主，先出完手中牌获胜！</p>
-                    </div>
-                    <a href="doudizhu.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-2 px-4 rounded-lg btn-3d transition-all">
-                        开始游戏
-                    </a>
-                </div>
-
-                <!-- 可以在这里添加更多游戏链接 -->
+    <!-- 标签页导航 -->
+    <nav class="bg-white border-b">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex space-x-8">
+                <button id="tab-website" class="tab-btn active py-4 px-2 border-b-2 border-primary text-primary font-medium">
+                    <i class="fa fa-globe mr-2"></i>网站
+                </button>
+                <button id="tab-tools" class="tab-btn py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
+                    <i class="fa fa-wrench mr-2"></i>工具类
+                </button>
+                <button id="tab-games" class="tab-btn py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
+                    <i class="fa fa-gamepad mr-2"></i>游戏集合
+                </button>
+                <button id="tab-other" class="tab-btn py-4 px-2 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">
+                    <i class="fa fa-ellipsis-h mr-2"></i>其他
+                </button>
             </div>
         </div>
-        
-        <footer class="mt-8 text-center text-sm text-gray-600">
-            <p>© 2026 游戏集合 | 使用 Tailwind CSS 构建</p>
-        </footer>
-    </div>
+    </nav>
+
+    <!-- 主要内容区域 -->
+    <main class="flex-1 max-w-6xl mx-auto px-4 py-8">
+
+        <!-- 网站面板 -->
+        <div id="panel-website" class="tab-panel active">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-3xl font-bold text-center mb-6 text-gray-800">欢迎来到 H5 多功能平台</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="text-center">
+                        <i class="fa fa-globe text-6xl text-primary mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">网站导航</h3>
+                        <p class="text-gray-600">快速访问常用网站和在线工具</p>
+                    </div>
+                    <div class="text-center">
+                        <i class="fa fa-rocket text-6xl text-secondary mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">快速体验</h3>
+                        <p class="text-gray-600">无需下载，浏览器即可使用</p>
+                    </div>
+                </div>
+                <div class="mt-8 text-center">
+                    <p class="text-lg text-gray-700">选择上方标签页开始使用各种功能</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 工具类面板 -->
+        <div id="panel-tools" class="tab-panel hidden">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">实用工具集合</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
+                        <i class="fa fa-calculator text-4xl text-blue-500 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">计算器</h3>
+                        <p class="text-gray-600 mb-4">科学计算器，支持复杂运算</p>
+                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            即将上线
+                        </button>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
+                        <i class="fa fa-clock text-4xl text-green-500 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">时间工具</h3>
+                        <p class="text-gray-600 mb-4">世界时钟、倒计时器、闹钟</p>
+                        <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            即将上线
+                        </button>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
+                        <i class="fa fa-paint-brush text-4xl text-purple-500 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">绘图工具</h3>
+                        <p class="text-gray-600 mb-4">在线画板、颜色选择器</p>
+                        <button class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            即将上线
+                        </button>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
+                        <i class="fa fa-file-text text-4xl text-red-500 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">文本工具</h3>
+                        <p class="text-gray-600 mb-4">格式转换、字符统计、编码解码</p>
+                        <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            即将上线
+                        </button>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
+                        <i class="fa fa-image text-4xl text-yellow-500 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">图片工具</h3>
+                        <p class="text-gray-600 mb-4">压缩、格式转换、水印添加</p>
+                        <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            即将上线
+                        </button>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
+                        <i class="fa fa-code text-4xl text-indigo-500 mb-4"></i>
+                        <h3 class="text-xl font-bold mb-2">代码工具</h3>
+                        <p class="text-gray-600 mb-4">格式化、压缩、在线运行</p>
+                        <button class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            即将上线
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 游戏集合面板 -->
+        <div id="panel-games" class="tab-panel hidden">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">游戏集合</h2>
+                <p class="text-center text-gray-600 mb-8">选择一个游戏开始游玩，享受精彩的游戏体验</p>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- 2048游戏链接 -->
+                    <div class="flex items-center p-6 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <div class="text-5xl mr-6 text-blue-600">
+                            <i class="fa fa-cubes"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold">2048 游戏</h3>
+                            <p class="text-gray-600 mt-1">合并数字方块，挑战高分！</p>
+                            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mt-2">益智</span>
+                        </div>
+                        <a href="2048.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-lg btn-3d transition-all ml-4">
+                            开始游戏
+                        </a>
+                    </div>
+
+                    <!-- 狼人杀游戏链接 -->
+                    <div class="flex items-center p-6 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <div class="text-5xl mr-6 text-purple-600">
+                            <i class="fa fa-users"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold">狼人杀</h3>
+                            <p class="text-gray-600 mt-1">推理与欺骗的社交游戏！</p>
+                            <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full mt-2">社交</span>
+                        </div>
+                        <a href="liangrensha.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-lg btn-3d transition-all ml-4">
+                            开始游戏
+                        </a>
+                    </div>
+
+                    <!-- 废弃医院恐怖游戏链接 -->
+                    <div class="flex items-center p-6 bg-red-50 rounded-lg hover:bg-red-100 transition-colors">
+                        <div class="text-5xl mr-6 text-red-600">
+                            <i class="fa fa-hospital-o"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold">废弃医院</h3>
+                            <p class="text-gray-600 mt-1">探索恐怖的废弃医院，寻找逃离的方法！</p>
+                            <span class="inline-block bg-red-100 text-red-800 text-xs px-2 py-1 rounded-full mt-2">恐怖</span>
+                        </div>
+                        <a href="feiqiyiyuan.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-lg btn-3d transition-all ml-4">
+                            开始游戏
+                        </a>
+                    </div>
+
+                    <!-- 像素飞机大战游戏链接 -->
+                    <div class="flex items-center p-6 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                        <div class="text-5xl mr-6 text-blue-600">
+                            <i class="fa fa-plane"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold">像素飞机大战</h3>
+                            <p class="text-gray-600 mt-1">经典街机射击游戏，驾驶飞机击败敌机，收集道具！</p>
+                            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mt-2">射击</span>
+                        </div>
+                        <a href="xiangsufeijidazhan.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-lg btn-3d transition-all ml-4">
+                            开始游戏
+                        </a>
+                    </div>
+
+                    <!-- 台球游戏增强版链接 -->
+                    <div class="flex items-center p-6 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                        <div class="text-5xl mr-6 text-green-600">
+                            <i class="fa fa-circle"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold">台球游戏增强版</h3>
+                            <p class="text-gray-600 mt-1">经典台球游戏，双人轮流击球，争夺花色球的胜利！</p>
+                            <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mt-2">体育</span>
+                        </div>
+                        <a href="taiqiu.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-lg btn-3d transition-all ml-4">
+                            开始游戏
+                        </a>
+                    </div>
+
+                    <!-- 斗地主游戏链接 -->
+                    <div class="flex items-center p-6 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
+                        <div class="text-5xl mr-6 text-orange-600">
+                            <i class="fa fa-clone"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold">斗地主</h3>
+                            <p class="text-gray-600 mt-1">经典斗地主游戏，与AI对手争夺地主，先出完手中牌获胜！</p>
+                            <span class="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full mt-2">策略</span>
+                        </div>
+                        <a href="doudizhu.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-lg btn-3d transition-all ml-4">
+                            开始游戏
+                        </a>
+                    </div>
+
+                    <!-- 斗地主全新版游戏链接 -->
+                    <div class="flex items-center p-6 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                        <div class="text-5xl mr-6 text-purple-600">
+                            <i class="fa fa-diamond"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold">斗地主全新版</h3>
+                            <p class="text-gray-600 mt-1">增强版斗地主游戏，精美动画，流畅体验，与AI智能对战！</p>
+                            <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded-full mt-2">策略</span>
+                        </div>
+                        <a href="doudizhu-qq.html" class="bg-primary hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-lg btn-3d transition-all ml-4">
+                            开始游戏
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 其他面板 -->
+        <div id="panel-other" class="tab-panel hidden">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">其他功能</h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">关于我们</h3>
+                        <p class="text-gray-600 mb-4">
+                            这是一个集多种功能于一身的H5平台，为用户提供便捷的在线工具和娱乐游戏体验。
+                        </p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fa fa-code mr-2"></i>
+                            <span>基于现代Web技术构建</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg p-6">
+                        <h3 class="text-xl font-bold mb-4 text-gray-800">技术栈</h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center text-gray-600">
+                                <i class="fa fa-html5 text-orange-500 mr-3"></i>
+                                <span>HTML5 + CSS3</span>
+                            </div>
+                            <div class="flex items-center text-gray-600">
+                                <i class="fa fa-code text-blue-500 mr-3"></i>
+                                <span>JavaScript (ES6+)</span>
+                            </div>
+                            <div class="flex items-center text-gray-600">
+                                <i class="fa fa-css3 text-blue-400 mr-3"></i>
+                                <span>Tailwind CSS</span>
+                            </div>
+                            <div class="flex items-center text-gray-600">
+                                <i class="fa fa-mobile text-green-500 mr-3"></i>
+                                <span>响应式设计</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-gradient-to-r from-primary to-secondary rounded-lg p-6 text-white text-center">
+                    <h3 class="text-xl font-bold mb-2">持续更新中</h3>
+                    <p>我们正在不断添加新的功能和游戏，敬请期待！</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <p class="text-gray-400">© 2026 H5多功能平台 | 使用 Tailwind CSS 构建</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Tab Switching -->
+    <script>
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab-btn');
+        const panels = document.querySelectorAll('.tab-panel');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.classList.remove('border-primary', 'text-primary');
+                    t.classList.add('border-transparent', 'text-gray-500');
+                });
+
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                tab.classList.remove('border-transparent', 'text-gray-500');
+                tab.classList.add('border-primary', 'text-primary');
+
+                // Hide all panels
+                panels.forEach(panel => {
+                    panel.classList.add('hidden');
+                    panel.classList.remove('active');
+                });
+
+                // Show corresponding panel
+                const panelId = tab.id.replace('tab-', 'panel-');
+                const targetPanel = document.getElementById(panelId);
+                targetPanel.classList.remove('hidden');
+                targetPanel.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
