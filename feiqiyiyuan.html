@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>恐怖游戏 - 废弃医院</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- GSAP 动画库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a1a1a',
+                        secondary: '#333333',
+                        accent: '#ff3a3a',
+                        warning: '#ffcc00',
+                        dark: '#0a0a0a',
+                        light: '#f0f0f0'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'fade-out': 'fadeOut 0.5s ease-in-out',
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        fadeOut: {
+                            '0%': { opacity: '1' },
+                            '100%': { opacity: '0' },
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            }
+            .text-shadow-lg {
+                text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+            }
+            .glow {
+                filter: drop-shadow(0 0 8px rgba(255, 58, 58, 0.8));
+            }
+            .glow-green {
+                filter: drop-shadow(0 0 8px rgba(0, 255, 128, 0.8));
+            }
+            .glow-blue {
+                filter: drop-shadow(0 0 8px rgba(0, 128, 255, 0.8));
+            }
+            .blur {
+                backdrop-filter: blur(4px);
+            }
+            .noise {
+                background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            }
+            .cursor-pointer {
+                cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff3a3a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cpath d='M12 8v8'%3E%3C/path%3E%3Cpath d='M8 12h8'%3E%3C/path%3E%3C/svg%3E") 12 12, auto;
+            }
+            .cursor-interact {
+                cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffcc00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2z'%3E%3C/path%3E%3C/svg%3E") 12 12, pointer;
+            }
+            .cursor-danger {
+                cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ff3a3a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6L6 18'%3E%3C/path%3E%3Cpath d='M6 6l12 12'%3E%3C/path%3E%3C/svg%3E") 12 12, not-allowed;
+            }
+        }
+    </style>
+    <style>
+        body {
+            overflow: hidden;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #game-view {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 1s ease-in-out;
+        }
+        
+        .interactive-object {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        
+        .interactive-object:hover {
+            transform: scale(1.1);
+        }
+        
+        .hotspot {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 204, 0, 0.3);
+            border: 2px solid rgba(255, 204, 0, 0.8);
+            animation: pulse 2s infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .hotspot:hover {
+            background-color: rgba(255, 204, 0, 0.5);
+            transform: scale(1.2);
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 204, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 204, 0, 0);
+            }
+        }
+        
+        #inventory {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .inventory-slot {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .inventory-slot:hover {
+            border-color: rgba(255, 204, 0, 0.8);
+            transform: translateY(-5px);
+        }
+        
+        .inventory-slot.filled {
+            border-color: rgba(255, 204, 0, 0.8);
+        }
+        
+        .inventory-item {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+        
+        #status-indicators {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 100;
+        }
+        
+        .status-bar {
+            width: 200px;
+            height: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .status-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        
+        .sanity-fill {
+            background-color: #0080ff;
+        }
+        
+        .health-fill {
+            background-color: #ff3a3a;
+        }
+        
+        .status-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2px;
+        }
+        
+        #notifications {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 200;
+            pointer-events: none;
+        }
+        
+        .notification {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 15px 30px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .notification.danger {
+            border-left: 4px solid #ff3a3a;
+        }
+        
+        .notification.warning {
+            border-left: 4px solid #ffcc00;
+        }
+        
+        .notification.success {
+            border-left: 4px solid #00cc66;
+        }
+        
+        #dialogue {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            max-width: 800px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 5px;
+            z-index: 150;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        #dialogue.show {
+            opacity: 1;
+        }
+        
+        #dialogue-text {
+            color: #fff;
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        #dialogue-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .dialogue-option {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+        
+        .dialogue-option:hover {
+            background-color: rgba(255, 204, 0, 0.3);
+            transform: translateX(5px);
+        }
+        
+        #game-menu {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        #game-menu.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .menu-title {
+            font-size: 48px;
+            color: #ff3a3a;
+            margin-bottom: 40px;
+            text-shadow: 0 0 20px rgba(255, 58, 58, 0.8);
+        }
+        
+        .menu-options {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 300px;
+        }
+        
+        .menu-option {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            text-align: center;
+        }
+        
+        .menu-option:hover {
+            background-color: rgba(255, 58, 58, 0.3);
+            border-color: #ff3a3a;
+            transform: translateY(-5px);
+        }
+        
+        #scene-transition {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            z-index: 400;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+        
+        #scene-transition.active {
+            opacity: 1;
+        }
+        
+        .ghost {
+            position: absolute;
+            width: 300px;
+            height: 500px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0;
+            z-index: 150;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5));
+        }
+        
+        .blood-splash {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            z-index: 180;
+            pointer-events: none;
+        }
+        
+        .static-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.1'/%3E%3C/svg%3E");
+            opacity: 0;
+            z-index: 170;
+            pointer-events: none;
+            transition: opacity 0.1s ease;
+        }
+        
+        .static-overlay.active {
+            opacity: 1;
+        }
+        
+        #end-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+        
+        #end-screen.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .end-title {
+            font-size: 64px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .end-text {
+            font-size: 24px;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+        
+        .end-stats {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .end-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .end-button {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+        }
+        
+        .end-button:hover {
+            background-color: rgba(255, 58, 58, 0.3);
+            border-color: #ff3a3a;
+            transform: translateY(-5px);
+        }
+        
+        /* 加载动画 */
+        #loading-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 1s ease;
+        }
+        
+        .loading-title {
+            font-size: 48px;
+            color: #ff3a3a;
+            margin-bottom: 40px;
+            text-shadow: 0 0 20px rgba(255, 58, 58, 0.8);
+        }
+        
+        .loading-bar {
+            width: 300px;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .loading-fill {
+            height: 100%;
+            width: 0%;
+            background-color: #ff3a3a;
+            transition: width 0.3s ease;
+        }
+        
+        .loading-text {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body class="noise cursor-pointer">
+    <!-- 加载屏幕 -->
+    <div id="loading-screen">
+        <h1 class="loading-title">废弃医院</h1>
+        <div class="loading-bar">
+            <div class="loading-fill" id="loading-progress"></div>
+        </div>
+        <p class="loading-text" id="loading-status">正在加载游戏...</p>
+    </div>
+
+    <!-- 游戏容器 -->
+    <div id="game-container">
+        <!-- 游戏视图 -->
+        <div id="game-view"></div>
+        
+        <!-- 交互热点 -->
+        <div id="hotspots-container"></div>
+        
+        <!-- 幽灵元素 -->
+        <div id="ghost" class="ghost"></div>
+        
+        <!-- 血迹飞溅效果 -->
+        <div id="blood-splash" class="blood-splash"></div>
+        
+        <!-- 静态噪点覆盖 -->
+        <div id="static-overlay" class="static-overlay"></div>
+        
+        <!-- 物品栏 -->
+        <div id="inventory">
+            <div class="inventory-slot" data-slot="0"></div>
+            <div class="inventory-slot" data-slot="1"></div>
+            <div class="inventory-slot" data-slot="2"></div>
+            <div class="inventory-slot" data-slot="3"></div>
+            <div class="inventory-slot" data-slot="4"></div>
+        </div>
+        
+        <!-- 状态指示器 -->
+        <div id="status-indicators">
+            <div>
+                <div class="status-label">理智值</div>
+                <div class="status-bar">
+                    <div class="status-fill sanity-fill" id="sanity-bar" style="width: 100%;"></div>
+                </div>
+            </div>
+            <div>
+                <div class="status-label">生命值</div>
+                <div class="status-bar">
+                    <div class="status-fill health-fill" id="health-bar" style="width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 通知区域 -->
+        <div id="notifications"></div>
+        
+        <!-- 对话区域 -->
+        <div id="dialogue">
+            <div id="dialogue-text"></div>
+            <div id="dialogue-options"></div>
+        </div>
+        
+        <!-- 场景过渡效果 -->
+        <div id="scene-transition"></div>
+        
+        <!-- 游戏菜单 -->
+        <div id="game-menu">
+            <h1 class="menu-title">废弃医院</h1>
+            <div class="menu-options">
+                <button class="menu-option" id="resume-game">继续游戏</button>
+                <button class="menu-option" id="restart-game">重新开始</button>
+                <button class="menu-option" id="exit-game">退出游戏</button>
+            </div>
+        </div>
+        
+        <!-- 结束屏幕 -->
+        <div id="end-screen">
+            <h1 class="end-title" id="end-title"></h1>
+            <p class="end-text" id="end-text"></p>
+            <div class="end-stats" id="end-stats">
+                <div class="stat-item">探索时间: <span id="end-time">0</span> 分钟</div>
+                <div class="stat-item">收集物品: <span id="end-items">0</span> / 5</div>
+                <div class="stat-item">遭遇幽灵: <span id="end-encounters">0</span> 次</div>
+            </div>
+            <div class="end-buttons">
+                <button class="end-button" id="play-again">再次挑战</button>
+                <button class="end-button" id="main-menu">返回主菜单</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 游戏数据
+        const gameData = {
+            player: {
+                inventory: [],
+                sanity: 100,
+                health: 100,
+                currentScene: 'entrance',
+                gameStartTime: null,
+                gameTime: 0,
+                ghostEncounters: 0
+            },
+            scenes: {
+                entrance: {
+                    background: 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/6f42f4a777a046fb810922ee7cf7ee55~tplv-a9rns2rl98-image.image?rcl=20260107100835EEAA21D8888A03365197&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1770343739&x-signature=9Z82m276rnR%2B66ChW%2BYKrlqAnM4%3D',
+                    name: '医院走廊',
+                    description: '你站在一个昏暗的医院走廊里，荧光灯在头顶闪烁，投下诡异的阴影。墙壁上有奇怪的红色痕迹，像是干涸的血迹。',
+                    hotspots: [
+                        { id: 'reception', x: 20, y: 30, width: 100, height: 150, action: 'examineReception' },
+                        { id: 'room1', x: 40, y: 60, width: 150, height: 100, action: 'goToPatientRoom' },
+                        { id: 'room2', x: 70, y: 40, width: 100, height: 200, action: 'goToMorgue' },
+                        { id: 'nurseStation', x: 50, y: 30, width: 150, height: 100, action: 'goToNurseStation' }
+                    ],
+                    onEnter: 'entranceDialogue'
+                },
+                patientRoom: {
+                    background: 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/f3b718bbd2904ecda8194e28c6e2b369~tplv-a9rns2rl98-image.image?rcl=20260107100835EEAA21D8888A03365197&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1770343751&x-signature=C1R5jAG7Bp3jABZr92EwG9TKWP8%3D',
+                    name: '病房',
+                    description: '病房里有一张破旧的病床，床上有血迹。输液架还立在那里，点滴瓶已经空了。墙上的监视器屏幕碎裂，发出微弱的蓝光。',
+                    hotspots: [
+                        { id: 'bed', x: 40, y: 50, width: 100, height: 150, action: 'examineBed' },
+                        { id: 'monitor', x: 70, y: 30, width: 100, height: 150, action: 'examineMonitor' },
+                        { id: 'cabinet', x: 20, y: 60, width: 80, height: 100, action: 'examineCabinet' },
+                        { id: 'door', x: 10, y: 40, width: 100, height: 200, action: 'goToEntrance' }
+                    ],
+                    onEnter: 'patientRoomAmbience'
+                },
+                morgue: {
+                    background: 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/21c31cf6188149dab3004d4efb118092~tplv-a9rns2rl98-image.image?rcl=20260107100835EEAA21D8888A03365197&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1770343763&x-signature=Rvd7WBmr%2F6EykvO3kpmCojxSD5E%3D',
+                    name: '停尸房',
+                    description: '停尸房里寒气逼人，几张金属解剖台并排摆放。其中一张的抽屉是打开的，里面空无一物。窗户破碎，寒风灌进来吹得你直发抖。',
+                    hotspots: [
+                        { id: 'drawer', x: 40, y: 60, width: 150, height: 100, action: 'examineDrawer' },
+                        { id: 'window', x: 80, y: 30, width: 100, height: 150, action: 'examineMorgueWindow' },
+                        { id: 'sink', x: 20, y: 40, width: 80, height: 100, action: 'examineSink' },
+                        { id: 'door', x: 10, y: 40, width: 100, height: 200, action: 'goToEntrance' }
+                    ],
+                    onEnter: 'morgueAmbience'
+                },
+                nurseStation: {
+                    background: 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/b7bbf2c28aa140d1b5ed0a30402f6056~tplv-a9rns2rl98-image.image?rcl=20260107100835EEAA21D8888A03365197&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1770343775&x-signature=PD0oYE3OclwYgE3X6nD0m7b6Jx8%3D',
+                    name: '护士站',
+                    description: '护士站的桌面上散落着各种医疗记录和碎玻璃。一台老式电脑屏幕碎裂，上面还显示着一些模糊的数据。墙上挂着一个日历，日期停留在十年前。',
+                    hotspots: [
+                        { id: 'computer', x: 40, y: 40, width: 100, height: 150, action: 'examineComputer' },
+                        { id: 'records', x: 60, y: 50, width: 150, height: 100, action: 'examineRecords' },
+                        { id: 'calendar', x: 80, y: 20, width: 80, height: 100, action: 'examineCalendar' },
+                        { id: 'door', x: 10, y: 40, width: 100, height: 200, action: 'goToEntrance' }
+                    ],
+                    onEnter: 'nurseStationAmbience'
+                },
+                basement: {
+                    background: 'https://p11-doubao-search-sign.byteimg.com/tos-cn-i-be4g95zd3a/903085198376042510~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782735405&x-signature=irmjIzTzdSd7UKv5uLR3UdGBUbA%3D',
+                    name: '医院地下室',
+                    description: '地下室里一片漆黑，只有你手中的手电筒发出微弱的光芒。空气中弥漫着潮湿和腐败的气味。墙上有奇怪的符号，像是某种仪式留下的。',
+                    hotspots: [
+                        { id: 'symbols', x: 40, y: 30, width: 150, height: 100, action: 'examineSymbols' },
+                        { id: 'altar', x: 70, y: 50, width: 120, height: 150, action: 'examineAltar' },
+                        { id: 'stairs', x: 10, y: 40, width: 100, height: 200, action: 'goToEntrance' }
+                    ],
+                    onEnter: 'basementAmbience'
+                }
+            },
+            items: {
+                key: {
+                    name: '生锈的钥匙',
+                    description: '一把生锈的钥匙，上面有"A-12"的标记，可能是某个房间的钥匙。',
+                    image: 'https://p3-doubao-search-sign.byteimg.com/labis/image/24b06e7161ee08cad2d57906f88de373~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782735405&x-signature=ImKpKiho8t9FwxgslLb7b%2F7FpCk%3D'
+                },
+                flashlight: {
+                    name: '手电筒',
+                    description: '一个旧手电筒，电池还有一些电。在黑暗的地方会很有用。',
+                    image: 'https://p3-doubao-search-sign.byteimg.com/labis/image/24b06e7161ee08cad2d57906f88de373~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782735405&x-signature=ImKpKiho8t9FwxgslLb7b%2F7FpCk%3D'
+                },
+                journal: {
+                    name: '医生日记',
+                    description: '一本医生的日记，记录着医院里发生的奇怪事件和病人的异常行为。',
+                    image: 'https://p3-doubao-search-sign.byteimg.com/labis/image/24b06e7161ee08cad2d57906f88de373~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782735405&x-signature=ImKpKiho8t9FwxgslLb7b%2F7FpCk%3D'
+                },
+                photo: {
+                    name: '护士照片',
+                    description: '一张护士的照片，但人脸部分被诡异的黑色物质覆盖，看起来非常恐怖。',
+                    image: 'https://p3-doubao-search-sign.byteimg.com/labis/image/24b06e7161ee08cad2d57906f88de373~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782735405&x-signature=ImKpKiho8t9FwxgslLb7b%2F7FpCk%3D'
+                },
+                amulet: {
+                    name: '银色护身符',
+                    description: '一个银色的护身符，上面刻着奇怪的符号。触摸它时会感到一阵温暖，似乎有某种保护作用。',
+                    image: 'https://p3-doubao-search-sign.byteimg.com/labis/image/24b06e7161ee08cad2d57906f88de373~tplv-be4g95zd3a-image.jpeg?lk3s=feb11e32&x-expires=1782735405&x-signature=ImKpKiho8t9FwxgslLb7b%2F7FpCk%3D'
+                }
+            },
+            ghosts: {
+                nurse: {
+                    image: 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/2f68ff88d9a64f6398d8005aa283b5c6~tplv-a9rns2rl98-image.image?rcl=20260107100835EEAA21D8888A03365197&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1770343788&x-signature=7xmC9YmQBoiOKYNEXtNU%2FjTiGKQ%3D',
+                    width: 300,
+                    height: 500
+                },
+                shadow: {
+                    image: 'https://p3-flow-imagex-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/96d99b9992db486ca3d40fddccdc31f3~tplv-a9rns2rl98-image.image?rcl=202512312016366C2B2617610195DB0F21&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769775442&x-signature=vmNjbLIimv6g7h2%2BcZuhYsvkvQ0%3D',
+                    width: 300,
+                    height: 500
+                }
+            },
+            bloodSplash: 'https://p3-doubao-search-sign.byteimg.com/tos-cn-i-a9rns2rl98/rc/pc/super_tool/2f5ee7cfaa4143e3b5a5fcd80aae2d7f~tplv-a9rns2rl98-image.image?rcl=202512312016366C2B2617610195DB0F21&rk3s=8e244e95&rrcfp=f06b921b&x-expires=1769775443&x-signature=QNbT10GoRC1rJjscftKojNX8Tv8%3D',
+            gameState: 'loading', // loading, playing, paused, ended
+            soundEnabled: true,
+            musicEnabled: true,
+            effectsEnabled: true
+        };
+        
+        // DOM 元素
+        const gameContainer = document.getElementById('game-container');
+        const gameView = document.getElementById('game-view');
+        const hotspotsContainer = document.getElementById('hotspots-container');
+        const inventory = document.getElementById('inventory');
+        const sanityBar = document.getElementById('sanity-bar');
+        const healthBar = document.getElementById('health-bar');
+        const notifications = document.getElementById('notifications');
+        const dialogue = document.getElementById('dialogue');
+        const dialogueText = document.getElementById('dialogue-text');
+        const dialogueOptions = document.getElementById('dialogue-options');
+        const sceneTransition = document.getElementById('scene-transition');
+        const gameMenu = document.getElementById('game-menu');
+        const endScreen = document.getElementById('end-screen');
+        const ghost = document.getElementById('ghost');
+        const bloodSplash = document.getElementById('blood-splash');
+        const staticOverlay = document.getElementById('static-overlay');
+        const loadingScreen = document.getElementById('loading-screen');
+        const loadingProgress = document.getElementById('loading-progress');
+        const loadingStatus = document.getElementById('loading-status');
+        
+        // 音效系统
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const sounds = {
+            ambient: null,
+            footsteps: null,
+            heartbeat: null,
+            ghost: null,
+            door: null,
+            item: null,
+            scream: null,
+            static: null
+        };
+        
+        // 加载音效
+        function loadSound(name, url) {
+            return fetch(url)
+                .then(response => response.arrayBuffer())
+                .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+                .then(audioBuffer => {
+                    sounds[name] = audioBuffer;
+                    return audioBuffer;
+                });
+        }
+        
+        // 播放音效
+        function playSound(name, volume = 1, loop = false) {
+            if (!gameData.soundEnabled || !sounds[name]) return;
+            
+            const source = audioContext.createBufferSource();
+            const gainNode = audioContext.createGain();
+            
+            source.buffer = sounds[name];
+            source.loop = loop;
+            gainNode.gain.value = volume;
+            
+            source.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            source.start(0);
+            
+            return {
+                source,
+                gainNode,
+                stop: () => source.stop()
+            };
+        }
+        
+        // 停止所有音效
+        function stopAllSounds() {
+            // 由于我们没有保存所有正在播放的音效实例，这里简化处理
+            // 在实际应用中，应该维护一个正在播放的音效列表
+            audioContext.resume().then(() => {
+                audioContext.close().then(() => {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                });
+            });
+        }
+        
+        // 更新状态条
+        function updateStatusBars() {
+            sanityBar.style.width = `${gameData.player.sanity}%`;
+            healthBar.style.width = `${gameData.player.health}%`;
+            
+            // 根据理智值变化背景效果
+            if (gameData.player.sanity < 30) {
+                gameView.style.filter = 'hue-rotate(180deg) saturate(1.5)';
+                if (gameData.player.sanity < 10) {
+                    gameView.style.filter = 'hue-rotate(180deg) saturate(2) blur(1px)';
+                }
+            } else {
+                gameView.style.filter = 'none';
+            }
+        }
+        
+        // 添加通知
+        function addNotification(message, type = 'info', duration = 3000) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            notifications.appendChild(notification);
+            
+            // 显示通知
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            // 自动移除通知
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentNode === notifications) {
+                        notifications.removeChild(notification);
+                    }
+                }, 500);
+            }, duration);
+        }
+        
+        // 显示对话
+        function showDialogue(text, options = []) {
+            dialogueText.textContent = text;
+            dialogueOptions.innerHTML = '';
+            
+            options.forEach(option => {
+                const button = document.createElement('button');
+                button.className = 'dialogue-option';
+                button.textContent = option.text;
+                button.onclick = () => {
+                    hideDialogue();
+                    if (option.action) {
+                        option.action();
+                    }
+                };
+                dialogueOptions.appendChild(button);
+            });
+            
+            dialogue.classList.add('show');
+        }
+        
+        // 隐藏对话
+        function hideDialogue() {
+            dialogue.classList.remove('show');
+        }
+        
+        // 添加物品到物品栏
+        function addItemToInventory(itemId) {
+            if (gameData.player.inventory.length >= 5) {
+                addNotification('物品栏已满！', 'warning');
+                return false;
+            }
+            
+            if (gameData.player.inventory.includes(itemId)) {
+                addNotification('你已经有这个物品了！', 'warning');
+                return false;
+            }
+            
+            gameData.player.inventory.push(itemId);
+            updateInventoryDisplay();
+            addNotification(`获得物品: ${gameData.items[itemId].name}`, 'success');
+            playSound('item', 0.5);
+            return true;
+        }
+        
+        // 从物品栏移除物品
+        function removeItemFromInventory(itemId) {
+            const index = gameData.player.inventory.indexOf(itemId);
+            if (index !== -1) {
+                gameData.player.inventory.splice(index, 1);
+                updateInventoryDisplay();
+                return true;
+            }
+            return false;
+        }
+        
+        // 更新物品栏显示
+        function updateInventoryDisplay() {
+            const slots = inventory.querySelectorAll('.inventory-slot');
+            
+            slots.forEach((slot, index) => {
+                slot.innerHTML = '';
+                slot.classList.remove('filled');
+                
+                if (gameData.player.inventory[index]) {
+                    const itemId = gameData.player.inventory[index];
+                    const item = gameData.items[itemId];
+                    
+                    const itemImage = document.createElement('img');
+                    itemImage.src = item.image;
+                    itemImage.alt = item.name;
+                    itemImage.className = 'inventory-item';
+                    
+                    slot.appendChild(itemImage);
+                    slot.classList.add('filled');
+                    
+                    // 添加点击事件以查看物品详情
+                    slot.onclick = () => {
+                        showDialogue(`${item.name}: ${item.description}`, [
+                            { text: '关闭', action: null }
+                        ]);
+                    };
+                } else {
+                    slot.onclick = null;
+                }
+            });
+        }
+        
+        // 检查是否拥有物品
+        function hasItem(itemId) {
+            return gameData.player.inventory.includes(itemId);
+        }
+        
+        // 创建热点
+        function createHotspots() {
+            hotspotsContainer.innerHTML = '';
+            const currentScene = gameData.scenes[gameData.player.currentScene];
+            
+            currentScene.hotspots.forEach(hotspot => {
+                const element = document.createElement('div');
+                element.className = 'hotspot';
+                element.style.left = `${hotspot.x}%`;
+                element.style.top = `${hotspot.y}%`;
+                element.style.width = `${hotspot.width}px`;
+                element.style.height = `${hotspot.height}px`;
+                element.dataset.action = hotspot.action;
+                
+                element.addEventListener('click', () => {
+                    const action = hotspot.action;
+                    if (typeof window[action] === 'function') {
+                        window[action]();
+                    }
+                });
+                
+                hotspotsContainer.appendChild(element);
+            });
+        }
+        
+        // 切换场景
+        function changeScene(sceneId) {
+            if (!gameData.scenes[sceneId]) return;
+            
+            // 播放门音效
+            playSound('door', 0.5);
+            
+            // 显示过渡效果
+            sceneTransition.classList.add('active');
+            
+            setTimeout(() => {
+                // 更新当前场景
+                gameData.player.currentScene = sceneId;
+                const scene = gameData.scenes[sceneId];
+                
+                // 更新背景
+                gameView.style.backgroundImage = `url(${scene.background})`;
+                
+                // 创建热点
+                createHotspots();
+                
+                // 隐藏过渡效果
+                sceneTransition.classList.remove('active');
+                
+                // 调用场景进入函数
+                if (typeof window[scene.onEnter] === 'function') {
+                    window[scene.onEnter]();
+                }
+                
+                // 随机触发幽灵事件
+                if (Math.random() < 0.3) {
+                    setTimeout(() => {
+                        triggerGhostEncounter();
+                    }, 3000);
+                }
+            }, 500);
+        }
+        
+        // 触发幽灵遭遇
+        function triggerGhostEncounter() {
+            if (gameData.player.sanity <= 0) return;
+            
+            gameData.player.ghostEncounters++;
+            
+            // 选择幽灵类型
+            const ghostType = Math.random() < 0.7 ? 'nurse' : 'shadow';
+            const ghostData = gameData.ghosts[ghostType];
+            
+            // 设置幽灵位置
+            ghost.style.backgroundImage = `url(${ghostData.image})`;
+            ghost.style.width = `${ghostData.width}px`;
+            ghost.style.height = `${ghostData.height}px`;
+            ghost.style.left = Math.random() < 0.5 ? '-100px' : 'calc(100% + 100px)';
+            ghost.style.top = '50%';
+            ghost.style.transform = 'translateY(-50%)';
+            
+            // 播放幽灵音效
+            playSound('ghost', 0.8);
+            
+            // 显示静态噪点
+            staticOverlay.classList.add('active');
+            
+            // 突然出现
+            gsap.to(ghost, {
+                opacity: 1,
+                duration: 0.3,
+                onComplete: () => {
+                    // 停顿一下
+                    setTimeout(() => {
+                        // 快速移动到屏幕中央
+                        gsap.to(ghost, {
+                            left: '50%',
+                            duration: 0.5,
+                            ease: 'power2.out',
+                            onComplete: () => {
+                                // 造成伤害和理智损失
+                                const damage = Math.floor(Math.random() * 20) + 10;
+                                const sanityLoss = Math.floor(Math.random() * 30) + 20;
+                                
+                                gameData.player.health = Math.max(0, gameData.player.health - damage);
+                                gameData.player.sanity = Math.max(0, gameData.player.sanity - sanityLoss);
+                                
+                                updateStatusBars();
+                                
+                                // 显示血迹飞溅
+                                bloodSplash.style.opacity = '0.5';
+                                
+                                // 播放尖叫声
+                                playSound('scream', 1);
+                                
+                                // 停顿
+                                setTimeout(() => {
+                                    // 消失
+                                    gsap.to(ghost, {
+                                        opacity: 0,
+                                        duration: 0.3,
+                                        onComplete: () => {
+                                            ghost.style.backgroundImage = 'none';
+                                            bloodSplash.style.opacity = '0';
+                                            staticOverlay.classList.remove('active');
+                                            
+                                            // 显示通知
+                                            addNotification(`你遭遇了恐怖的幽灵！失去了 ${damage} 点生命值和 ${sanityLoss} 点理智值。`, 'danger', 4000);
+                                            
+                                            // 检查游戏结束条件
+                                            checkGameEnd();
+                                        }
+                                    });
+                                }, 1000);
+                            }
+                        });
+                    }, 1000);
+                }
+            });
+        }
+        
+        // 检查游戏结束条件
+        function checkGameEnd() {
+            if (gameData.player.health <= 0) {
+                endGame(false, '你被医院中的恐怖存在杀死了...');
+            } else if (gameData.player.sanity <= 0) {
+                endGame(false, '你的理智彻底崩溃了...');
+            } else if (gameData.player.inventory.length >= 5) {
+                // 收集了所有物品，可以逃离
+                endGame(true, '你成功收集了所有线索，找到了逃离这家恐怖医院的方法！');
+            }
+        }
+        
+        // 结束游戏
+        function endGame(isVictory, message) {
+            gameData.gameState = 'ended';
+            
+            // 计算游戏时间
+            const endTime = new Date();
+            const gameMinutes = Math.floor((endTime - gameData.player.gameStartTime) / 60000);
+            
+            // 更新结束屏幕
+            document.getElementById('end-title').textContent = isVictory ? '逃脱成功！' : '游戏结束';
+            document.getElementById('end-text').textContent = message;
+            document.getElementById('end-time').textContent = gameMinutes;
+            document.getElementById('end-items').textContent = gameData.player.inventory.length;
+            document.getElementById('end-encounters').textContent = gameData.player.ghostEncounters;
+            
+            // 显示结束屏幕
+            endScreen.classList.add('show');
+        }
+        
+        // 重新开始游戏
+        function restartGame() {
+            // 重置游戏数据
+            gameData.player = {
+                inventory: [],
+                sanity: 100,
+                health: 100,
+                currentScene: 'entrance',
+                gameStartTime: new Date(),
+                gameTime: 0,
+                ghostEncounters: 0
+            };
+            
+            gameData.gameState = 'playing';
+            
+            // 更新UI
+            updateStatusBars();
+            updateInventoryDisplay();
+            
+            // 隐藏结束屏幕和菜单
+            endScreen.classList.remove('show');
+            gameMenu.classList.remove('show');
+            
+            // 开始游戏
+            startGame();
+        }
+        
+        // 开始游戏
+        function startGame() {
+            // 设置开始时间
+            gameData.player.gameStartTime = new Date();
+            
+            // 初始化场景
+            changeScene('entrance');
+            
+            // 开始理智值缓慢下降
+            setInterval(() => {
+                if (gameData.gameState === 'playing' && gameData.player.sanity > 0) {
+                    gameData.player.sanity = Math.max(0, gameData.player.sanity - 0.5);
+                    updateStatusBars();
+                    
+                    // 检查游戏结束条件
+                    checkGameEnd();
+                }
+            }, 5000);
+        }
+        
+        // 入口场景对话
+        function entranceDialogue() {
+            showDialogue('你站在废弃医院的走廊里，四周一片死寂。为什么你会在这里？你记得自己是一名调查记者，前来调查这家十年前神秘关闭的医院。但现在，你感觉有些不对劲...', [
+                { text: '环顾四周，寻找线索', action: () => {
+                    addNotification('走廊两侧有几个房间，墙上有奇怪的红色痕迹。', 'info');
+                }},
+                { text: '检查接待台', action: examineReception },
+                { text: '走向最近的房间', action: () => changeScene('patientRoom') }
+            ]);
+        }
+        
+        // 检查接待台
+        function examineReception() {
+            addNotification('接待台上散落着一些文件和碎玻璃，看起来曾经发生过激烈的争执。', 'info');
+            
+            // 有几率找到钥匙
+            if (Math.random() < 0.3 && !hasItem('key')) {
+                setTimeout(() => {
+                    addNotification('你在桌子下面发现了一把生锈的钥匙！', 'success');
+                    addItemToInventory('key');
+                }, 1000);
+            }
+        }
+        
+        // 检查病床
+        function examineBed() {
+            addNotification('病床上有干涸的血迹，床单被撕成碎片。看起来病人在死前经历了极大的痛苦。', 'warning');
+            gameData.player.sanity = Math.max(0, gameData.player.sanity - 5);
+            updateStatusBars();
+            
+            // 有几率找到日记
+            if (Math.random() < 0.4 && !hasItem('journal')) {
+                setTimeout(() => {
+                    addNotification('你在床垫下发现了一本医生日记！', 'success');
+                    addItemToInventory('journal');
+                }, 1000);
+            }
+        }
+        
+        // 检查监视器
+        function examineMonitor() {
+            addNotification('监视器屏幕已经碎裂，但还在发出微弱的蓝光。屏幕上显示着一些模糊的数据，似乎是病人的生命体征。', 'info');
+            
+            // 突然闪烁
+            setTimeout(() => {
+                staticOverlay.classList.add('active');
+                setTimeout(() => {
+                    staticOverlay.classList.remove('active');
+                    gameData.player.sanity = Math.max(0, gameData.player.sanity - 10);
+                    updateStatusBars();
+                    addNotification('监视器突然闪烁，你感到一阵不安...', 'warning');
+                }, 500);
+            }, 2000);
+        }
+        
+        // 检查柜子
+        function examineCabinet() {
+            addNotification('柜子里有一些医疗用品，但大多已经过期。有几个抽屉是锁着的。', 'info');
+            
+            // 如果有钥匙
+            if (hasItem('key')) {
+                setTimeout(() => {
+                    showDialogue('你发现一个锁着的抽屉，你有一把钥匙，要尝试打开吗？', [
+                        { text: '使用钥匙打开', action: () => {
+                            addNotification('你用钥匙打开了抽屉，里面有一个手电筒！', 'success');
+                            addItemToInventory('flashlight');
+                            removeItemFromInventory('key');
+                        }},
+                        { text: '不打开', action: null }
+                    ]);
+                }, 1000);
+            }
+        }
+        
+        // 检查抽屉
+        function examineDrawer() {
+            addNotification('这是一个停尸抽屉，里面空无一物。抽屉上有一些奇怪的抓痕，像是有人在里面试图逃出来。', 'danger');
+            gameData.player.sanity = Math.max(0, gameData.player.sanity - 15);
+            updateStatusBars();
+        }
+        
+        // 检查停尸房窗户
+        function examineMorgueWindow() {
+            addNotification('窗户已经破碎，寒风灌进来。窗外一片漆黑，什么都看不见。', 'info');
+        }
+        
+        // 检查水槽
+        function examineSink() {
+            addNotification('水槽里有一些干涸的红色物质，看起来像是血迹。水龙头还在缓慢滴水，发出滴答滴答的声音。', 'warning');
+        }
+        
+        // 检查电脑
+        function examineComputer() {
+            addNotification('电脑屏幕已经碎裂，但硬盘可能还能读取。你需要一些工具才能获取里面的数据。', 'info');
+        }
+        
+        // 检查医疗记录
+        function examineRecords() {
+            addNotification('这些是病人的医疗记录，记录着一些奇怪的症状和治疗方法。大多数病人都有相同的症状：失眠、幻觉、极度恐惧...', 'warning');
+            gameData.player.sanity = Math.max(0, gameData.player.sanity - 10);
+            updateStatusBars();
+            
+            // 有几率找到护士照片
+            if (Math.random() < 0.3 && !hasItem('photo')) {
+                setTimeout(() => {
+                    addNotification('你在记录中发现了一张护士的照片！', 'success');
+                    addItemToInventory('photo');
+                }, 1000);
+            }
+        }
+        
+        // 检查日历
+        function examineCalendar() {
+            addNotification('日历上的日期停留在十年前的10月31日，万圣节。这一天似乎是医院关闭的日子。', 'info');
+        }
+        
+        // 检查符号
+        function examineSymbols() {
+            addNotification('墙上画着一些奇怪的符号，看起来像是某种邪教仪式的标记。触摸这些符号时，你感到一阵寒意。', 'danger');
+            gameData.player.sanity = Math.max(0, gameData.player.sanity - 20);
+            updateStatusBars();
+            
+            // 有几率找到护身符
+            if (Math.random() < 0.2 && !hasItem('amulet')) {
+                setTimeout(() => {
+                    addNotification('你在符号旁边发现了一个银色护身符！', 'success');
+                    addItemToInventory('amulet');
+                }, 1000);
+            }
+        }
+        
+        // 检查祭坛
+        function examineAltar() {
+            addNotification('这是一个简易的祭坛，上面有一些奇怪的物品和干涸的血迹。看起来这里进行过某种邪恶的仪式。', 'danger');
+            gameData.player.sanity = Math.max(0, gameData.player.sanity - 25);
+            updateStatusBars();
+            
+            // 高几率触发幽灵遭遇
+            if (Math.random() < 0.8) {
+                setTimeout(() => {
+                    triggerGhostEncounter();
+                }, 1000);
+            }
+        }
+        
+        // 场景进入函数
+        function entranceDialogue() {
+            playSound('ambient', 0.3, true);
+        }
+        
+        function patientRoomAmbience() {
+            addNotification('病房里弥漫着一股消毒水和腐败的混合气味。', 'info');
+        }
+        
+        function morgueAmbience() {
+            addNotification('停尸房里寒气逼人，你不禁打了个寒颤。', 'warning');
+            gameData.player.sanity = Math.max(0, gameData.player.sanity - 5);
+            updateStatusBars();
+        }
+        
+        function nurseStationAmbience() {
+            addNotification('护士站里散落着各种医疗记录，你可以在这里找到一些线索。', 'info');
+        }
+        
+        function basementAmbience() {
+            addNotification('地下室里一片漆黑，如果没有手电筒，你几乎什么都看不见。', 'warning');
+            if (!hasItem('flashlight')) {
+                gameData.player.sanity = Math.max(0, gameData.player.sanity - 10);
+                updateStatusBars();
+            }
+        }
+        
+        // 场景切换函数
+        function goToEntrance() {
+            changeScene('entrance');
+        }
+        
+        function goToPatientRoom() {
+            changeScene('patientRoom');
+        }
+        
+        function goToMorgue() {
+            changeScene('morgue');
+        }
+        
+        function goToNurseStation() {
+            changeScene('nurseStation');
+        }
+        
+        function goToBasement() {
+            if (hasItem('key')) {
+                changeScene('basement');
+            } else {
+                addNotification('门被锁住了，你需要找到钥匙。', 'warning');
+            }
+        }
+        
+        // 模拟加载过程
+        function simulateLoading() {
+            let progress = 0;
+            const loadingSteps = [
+                '正在加载游戏资源...',
+                '正在初始化游戏世界...',
+                '正在连接到恐怖维度...',
+                '正在唤醒沉睡的灵魂...',
+                '正在准备你的噩梦...',
+                '游戏加载完成！'
+            ];
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    // 加载完成，开始游戏
+                    setTimeout(() => {
+                        loadingScreen.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                            gameData.gameState = 'playing';
+                            startGame();
+                        }, 1000);
+                    }, 1000);
+                }
+                
+                loadingProgress.style.width = `${progress}%`;
+                
+                // 更新加载文本
+                const stepIndex = Math.min(Math.floor(progress / 20), loadingSteps.length - 1);
+                loadingStatus.textContent = loadingSteps[stepIndex];
+            }, 300);
+        }
+        
+        // 事件监听器
+        document.getElementById('resume-game').addEventListener('click', () => {
+            gameMenu.classList.remove('show');
+            gameData.gameState = 'playing';
+        });
+        
+        document.getElementById('restart-game').addEventListener('click', restartGame);
+        
+        document.getElementById('exit-game').addEventListener('click', () => {
+            // 在实际应用中，这里可以添加退出确认
+            alert('感谢游玩！');
+        });
+        
+        document.getElementById('play-again').addEventListener('click', restartGame);
+        
+        document.getElementById('main-menu').addEventListener('click', () => {
+            endScreen.classList.remove('show');
+            gameMenu.classList.add('show');
+        });
+        
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (gameData.gameState === 'playing') {
+                    gameData.gameState = 'paused';
+                    gameMenu.classList.add('show');
+                } else if (gameData.gameState === 'paused') {
+                    gameData.gameState = 'playing';
+                    gameMenu.classList.remove('show');
+                }
+            }
+        });
+        
+        // 初始化游戏
+        window.addEventListener('load', () => {
+            // 初始化物品栏
+            updateInventoryDisplay();
+            
+            // 初始化状态条
+            updateStatusBars();
+            
+            // 模拟加载过程
+            simulateLoading();
+        });
+    </script>
+</body>
+</html>
