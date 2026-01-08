@@ -116,54 +116,256 @@
         <div id="panel-tools" class="tab-panel hidden">
             <div class="bg-white rounded-lg shadow-lg p-8">
                 <h2 class="text-3xl font-bold text-center mb-8 text-gray-800">实用工具集合</h2>
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
-                        <i class="fa fa-calculator text-4xl text-blue-500 mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">计算器</h3>
-                        <p class="text-gray-600 mb-4">科学计算器，支持复杂运算</p>
-                        <button class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            即将上线
-                        </button>
+
+                <!-- 工具选择按钮 -->
+                <div class="grid md:grid-cols-3 gap-4 mb-8">
+                    <button id="tool-calculator" class="tool-btn bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center">
+                        <i class="fa fa-calculator mr-2"></i>计算器
+                    </button>
+                    <button id="tool-timer" class="tool-btn bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center">
+                        <i class="fa fa-clock mr-2"></i>时间工具
+                    </button>
+                    <button id="tool-text" class="tool-btn bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center">
+                        <i class="fa fa-file-text mr-2"></i>文本工具
+                    </button>
+                    <button id="tool-drawing" class="tool-btn bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center">
+                        <i class="fa fa-paint-brush mr-2"></i>绘图工具
+                    </button>
+                    <button id="tool-image" class="tool-btn bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center">
+                        <i class="fa fa-image mr-2"></i>图片工具
+                    </button>
+                    <button id="tool-code" class="tool-btn bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center">
+                        <i class="fa fa-code mr-2"></i>代码工具
+                    </button>
+                </div>
+
+                <!-- 工具内容区域 -->
+                <div id="tool-content" class="bg-gray-50 rounded-lg p-6 min-h-96">
+                    <!-- 默认提示 -->
+                    <div id="tool-default" class="tool-panel text-center py-12">
+                        <i class="fa fa-wrench text-6xl text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-bold text-gray-600 mb-2">选择一个工具开始使用</h3>
+                        <p class="text-gray-500">点击上方按钮选择您需要的工具</p>
                     </div>
-                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
-                        <i class="fa fa-clock text-4xl text-green-500 mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">时间工具</h3>
-                        <p class="text-gray-600 mb-4">世界时钟、倒计时器、闹钟</p>
-                        <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            即将上线
-                        </button>
+
+                    <!-- 计算器 -->
+                    <div id="tool-calculator-panel" class="tool-panel hidden">
+                        <h3 class="text-2xl font-bold mb-6 text-center">科学计算器</h3>
+                        <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
+                            <div class="mb-4">
+                                <input type="text" id="calc-display" class="w-full text-right text-2xl p-3 border rounded-lg bg-gray-50" readonly>
+                            </div>
+                            <div class="grid grid-cols-4 gap-2">
+                                <button class="calc-btn bg-gray-200 hover:bg-gray-300 p-3 rounded-lg font-bold" data-value="C">C</button>
+                                <button class="calc-btn bg-gray-200 hover:bg-gray-300 p-3 rounded-lg font-bold" data-value="±">±</button>
+                                <button class="calc-btn bg-gray-200 hover:bg-gray-300 p-3 rounded-lg font-bold" data-value="%">%</button>
+                                <button class="calc-btn bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-lg font-bold" data-value="/">÷</button>
+                                <button class="calc-btn bg-gray-100 hover:bg-gray-200 p-3 rounded-lg font-bold" data-value="7">7</button>
+                                <button class="calc-btn bg-gray-100 hover:bg-gray-200 p-3 rounded-lg font-bold" data-value="8">8</button>
+                                <button class="calc-btn bg-gray-100 hover:bg-gray-200 p-3 rounded-lg font-bold" data-value="9">9</button>
+                                <button class="calc-btn bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-lg font-bold" data-value="*">×</button>
+                                <button class="calc-btn bg-gray-100 hover:bg-gray-200 p-3 rounded-lg font-bold" data-value="4">4</button>
+                                <button class="calc-btn bg-gray-100 hover:bg-gray-200 p-3 rounded-lg font-bold" data-value="5">5</button>
+                                <button class="calc-btn bg-gray-100 hover:bg-gray-200 p-3 rounded-lg font-bold" data-value="6">6</button>
+                                <button class="calc-btn bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-lg font-bold" data-value="-">-</button>
+                                <button class="calc-btn bg-gray-100 hover:bg-gray-200 p-3 rounded-lg font-bold" data-value="1">1</button>
+                                <button class="calc-btn bg-gray-100 hover:bg-gray-200 p-3 rounded-lg font-bold" data-value="2">2</button>
+                                <button class="calc-btn bg-gray-100 hover:bg-gray-200 p-3 rounded-lg font-bold" data-value="3">3</button>
+                                <button class="calc-btn bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-lg font-bold" data-value="+">+</button>
+                                <button class="calc-btn bg-gray-100 hover:bg-gray-200 p-3 rounded-lg font-bold col-span-2" data-value="0">0</button>
+                                <button class="calc-btn bg-gray-100 hover:bg-gray-200 p-3 rounded-lg font-bold" data-value=".">.</button>
+                                <button class="calc-btn bg-orange-500 hover:bg-orange-600 text-white p-3 rounded-lg font-bold" data-value="=">=</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
-                        <i class="fa fa-paint-brush text-4xl text-purple-500 mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">绘图工具</h3>
-                        <p class="text-gray-600 mb-4">在线画板、颜色选择器</p>
-                        <button class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            即将上线
-                        </button>
+
+                    <!-- 时间工具 -->
+                    <div id="tool-timer-panel" class="tool-panel hidden">
+                        <h3 class="text-2xl font-bold mb-6 text-center">时间工具</h3>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <!-- 世界时钟 -->
+                            <div class="bg-white rounded-lg p-4 shadow">
+                                <h4 class="font-bold mb-3 text-center">世界时钟</h4>
+                                <div class="text-center">
+                                    <div id="world-time" class="text-2xl font-mono mb-2">--:--:--</div>
+                                    <div class="text-sm text-gray-600">北京时间</div>
+                                </div>
+                            </div>
+
+                            <!-- 倒计时器 -->
+                            <div class="bg-white rounded-lg p-4 shadow">
+                                <h4 class="font-bold mb-3 text-center">倒计时器</h4>
+                                <div class="text-center">
+                                    <input type="number" id="countdown-minutes" placeholder="分钟" class="w-20 p-2 border rounded text-center mb-2">
+                                    <div id="countdown-display" class="text-2xl font-mono mb-2">--:--</div>
+                                    <button id="countdown-start" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">开始</button>
+                                    <button id="countdown-stop" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded ml-2">停止</button>
+                                </div>
+                            </div>
+
+                            <!-- 闹钟 -->
+                            <div class="bg-white rounded-lg p-4 shadow">
+                                <h4 class="font-bold mb-3 text-center">闹钟</h4>
+                                <div class="text-center">
+                                    <input type="time" id="alarm-time" class="p-2 border rounded mb-2">
+                                    <div id="alarm-status" class="text-sm text-gray-600 mb-2">未设置</div>
+                                    <button id="alarm-set" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">设置闹钟</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
-                        <i class="fa fa-file-text text-4xl text-red-500 mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">文本工具</h3>
-                        <p class="text-gray-600 mb-4">格式转换、字符统计、编码解码</p>
-                        <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            即将上线
-                        </button>
+
+                    <!-- 文本工具 -->
+                    <div id="tool-text-panel" class="tool-panel hidden">
+                        <h3 class="text-2xl font-bold mb-6 text-center">文本工具</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- 字符统计 -->
+                            <div class="bg-white rounded-lg p-4 shadow">
+                                <h4 class="font-bold mb-3">字符统计</h4>
+                                <textarea id="text-input" placeholder="输入文本..." class="w-full h-32 p-3 border rounded resize-none" oninput="updateTextStats()"></textarea>
+                                <div class="mt-3 grid grid-cols-3 gap-2 text-sm">
+                                    <div class="text-center">
+                                        <div class="font-bold text-blue-600" id="char-count">0</div>
+                                        <div class="text-gray-600">字符数</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="font-bold text-green-600" id="word-count">0</div>
+                                        <div class="text-gray-600">单词数</div>
+                                    </div>
+                                    <div class="text-center">
+                                        <div class="font-bold text-purple-600" id="line-count">0</div>
+                                        <div class="text-gray-600">行数</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 文本格式转换 -->
+                            <div class="bg-white rounded-lg p-4 shadow">
+                                <h4 class="font-bold mb-3">文本格式转换</h4>
+                                <div class="space-y-2 mb-3">
+                                    <button onclick="convertToUpper()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">大写</button>
+                                    <button onclick="convertToLower()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm ml-1">小写</button>
+                                    <button onclick="convertToTitle()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm ml-1">首字母大写</button>
+                                </div>
+                                <textarea id="format-input" placeholder="输入要转换的文本..." class="w-full h-32 p-3 border rounded resize-none mb-3"></textarea>
+                                <button onclick="copyFormattedText()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">复制结果</button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
-                        <i class="fa fa-image text-4xl text-yellow-500 mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">图片工具</h3>
-                        <p class="text-gray-600 mb-4">压缩、格式转换、水印添加</p>
-                        <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            即将上线
-                        </button>
+
+                    <!-- 绘图工具 -->
+                    <div id="tool-drawing-panel" class="tool-panel hidden">
+                        <h3 class="text-2xl font-bold mb-6 text-center">在线画板</h3>
+                        <div class="max-w-4xl mx-auto">
+                            <div class="bg-white rounded-lg p-4 shadow mb-4">
+                                <div class="flex flex-wrap gap-4 items-center justify-center">
+                                    <div class="flex items-center gap-2">
+                                        <label class="text-sm font-medium">画笔颜色:</label>
+                                        <input type="color" id="brush-color" value="#000000" class="w-8 h-8 border rounded">
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <label class="text-sm font-medium">画笔大小:</label>
+                                        <input type="range" id="brush-size" min="1" max="20" value="5" class="w-20">
+                                        <span id="brush-size-display" class="text-sm w-6">5</span>
+                                    </div>
+                                    <button id="clear-canvas" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">清空画板</button>
+                                    <button id="save-canvas" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">保存图片</button>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg p-4 shadow">
+                                <canvas id="drawing-canvas" width="800" height="400" class="border rounded max-w-full h-auto cursor-crosshair"></canvas>
+                            </div>
+                        </div>
                     </div>
-                    <div class="bg-gray-50 rounded-lg p-6 text-center hover:shadow-md transition-shadow">
-                        <i class="fa fa-code text-4xl text-indigo-500 mb-4"></i>
-                        <h3 class="text-xl font-bold mb-2">代码工具</h3>
-                        <p class="text-gray-600 mb-4">格式化、压缩、在线运行</p>
-                        <button class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            即将上线
-                        </button>
+
+                    <!-- 图片工具 -->
+                    <div id="tool-image-panel" class="tool-panel hidden">
+                        <h3 class="text-2xl font-bold mb-6 text-center">图片工具</h3>
+                        <div class="max-w-4xl mx-auto">
+                            <div class="bg-white rounded-lg p-6 shadow">
+                                <div class="text-center mb-6">
+                                    <input type="file" id="image-input" accept="image/*" class="hidden">
+                                    <label for="image-input" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg cursor-pointer inline-block">
+                                        <i class="fa fa-upload mr-2"></i>选择图片
+                                    </label>
+                                    <div id="image-info" class="mt-3 text-sm text-gray-600 hidden">
+                                        文件大小: <span id="file-size">0</span> KB |
+                                        尺寸: <span id="image-size">0x0</span> |
+                                        格式: <span id="image-format">-</span>
+                                    </div>
+                                </div>
+
+                                <div id="image-preview" class="hidden text-center mb-6">
+                                    <img id="preview-img" class="max-w-full max-h-64 border rounded shadow" alt="预览图片">
+                                </div>
+
+                                <div class="grid md:grid-cols-3 gap-4">
+                                    <div class="text-center">
+                                        <button id="compress-image" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded w-full disabled:opacity-50" disabled>
+                                            <i class="fa fa-compress mr-2"></i>压缩图片
+                                        </button>
+                                    </div>
+                                    <div class="text-center">
+                                        <button id="convert-format" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded w-full disabled:opacity-50" disabled>
+                                            <i class="fa fa-exchange mr-2"></i>格式转换
+                                        </button>
+                                    </div>
+                                    <div class="text-center">
+                                        <button id="download-image" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full disabled:opacity-50" disabled>
+                                            <i class="fa fa-download mr-2"></i>下载图片
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 代码工具 -->
+                    <div id="tool-code-panel" class="tool-panel hidden">
+                        <h3 class="text-2xl font-bold mb-6 text-center">代码工具</h3>
+                        <div class="max-w-6xl mx-auto">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <!-- 代码输入 -->
+                                <div class="bg-white rounded-lg p-4 shadow">
+                                    <h4 class="font-bold mb-3">代码输入</h4>
+                                    <select id="code-language" class="w-full p-2 border rounded mb-3">
+                                        <option value="javascript">JavaScript</option>
+                                        <option value="html">HTML</option>
+                                        <option value="css">CSS</option>
+                                        <option value="python">Python</option>
+                                        <option value="json">JSON</option>
+                                    </select>
+                                    <textarea id="code-input" placeholder="输入代码..." class="w-full h-64 p-3 border rounded font-mono text-sm resize-none"></textarea>
+                                </div>
+
+                                <!-- 工具按钮 -->
+                                <div class="bg-white rounded-lg p-4 shadow">
+                                    <h4 class="font-bold mb-3">工具</h4>
+                                    <div class="space-y-3">
+                                        <button id="format-code" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded w-full">
+                                            <i class="fa fa-magic mr-2"></i>格式化代码
+                                        </button>
+                                        <button id="minify-code" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded w-full">
+                                            <i class="fa fa-compress mr-2"></i>压缩代码
+                                        </button>
+                                        <button id="copy-code" class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded w-full">
+                                            <i class="fa fa-copy mr-2"></i>复制代码
+                                        </button>
+                                        <button id="clear-code" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded w-full">
+                                            <i class="fa fa-trash mr-2"></i>清空
+                                        </button>
+                                    </div>
+
+                                    <div class="mt-4">
+                                        <h5 class="font-bold mb-2">统计信息</h5>
+                                        <div class="grid grid-cols-2 gap-2 text-sm">
+                                            <div>字符数: <span id="code-char-count" class="font-bold">0</span></div>
+                                            <div>行数: <span id="code-line-count" class="font-bold">0</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -366,7 +568,7 @@
         </div>
     </footer>
 
-    <!-- JavaScript for Tab Switching -->
+    <!-- JavaScript for Tab Switching and Tools -->
     <script>
         // Tab switching functionality
         const tabs = document.querySelectorAll('.tab-btn');
@@ -398,6 +600,453 @@
                 targetPanel.classList.remove('hidden');
                 targetPanel.classList.add('active');
             });
+        });
+
+        // Tool switching functionality
+        const toolBtns = document.querySelectorAll('.tool-btn');
+        const toolPanels = document.querySelectorAll('.tool-panel');
+
+        toolBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all tool buttons
+                toolBtns.forEach(b => b.classList.remove('ring-2', 'ring-offset-2'));
+
+                // Add active class to clicked button
+                btn.classList.add('ring-2', 'ring-offset-2');
+
+                // Hide all tool panels
+                toolPanels.forEach(panel => {
+                    panel.classList.add('hidden');
+                });
+
+                // Show corresponding tool panel
+                const panelId = btn.id + '-panel';
+                const targetPanel = document.getElementById(panelId);
+                targetPanel.classList.remove('hidden');
+            });
+        });
+
+        // Calculator functionality
+        let calcExpression = '';
+        let calcResult = '';
+
+        document.querySelectorAll('.calc-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const value = btn.dataset.value;
+                const display = document.getElementById('calc-display');
+
+                if (value === 'C') {
+                    calcExpression = '';
+                    calcResult = '';
+                    display.value = '';
+                } else if (value === '=') {
+                    try {
+                        calcResult = eval(calcExpression.replace('×', '*').replace('÷', '/'));
+                        display.value = calcResult;
+                        calcExpression = calcResult.toString();
+                    } catch (e) {
+                        display.value = 'Error';
+                        calcExpression = '';
+                    }
+                } else if (value === '±') {
+                    if (calcExpression) {
+                        calcExpression = calcExpression.startsWith('-') ?
+                            calcExpression.substring(1) : '-' + calcExpression;
+                        display.value = calcExpression;
+                    }
+                } else if (value === '%') {
+                    if (calcExpression) {
+                        calcExpression = (parseFloat(calcExpression) / 100).toString();
+                        display.value = calcExpression;
+                    }
+                } else {
+                    calcExpression += value;
+                    display.value = calcExpression;
+                }
+            });
+        });
+
+        // World clock functionality
+        function updateWorldTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('zh-CN', {
+                hour12: false,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('world-time').textContent = timeString;
+        }
+
+        updateWorldTime();
+        setInterval(updateWorldTime, 1000);
+
+        // Countdown timer functionality
+        let countdownInterval = null;
+        let countdownTime = 0;
+
+        document.getElementById('countdown-start').addEventListener('click', () => {
+            const minutes = parseInt(document.getElementById('countdown-minutes').value);
+            if (minutes > 0) {
+                countdownTime = minutes * 60;
+                updateCountdownDisplay();
+
+                if (countdownInterval) clearInterval(countdownInterval);
+                countdownInterval = setInterval(() => {
+                    countdownTime--;
+                    updateCountdownDisplay();
+
+                    if (countdownTime <= 0) {
+                        clearInterval(countdownInterval);
+                        alert('倒计时结束！');
+                        document.getElementById('countdown-display').textContent = '00:00';
+                    }
+                }, 1000);
+            }
+        });
+
+        document.getElementById('countdown-stop').addEventListener('click', () => {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+        });
+
+        function updateCountdownDisplay() {
+            const minutes = Math.floor(countdownTime / 60);
+            const seconds = countdownTime % 60;
+            document.getElementById('countdown-display').textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Alarm functionality
+        let alarmTime = null;
+        let alarmInterval = null;
+
+        document.getElementById('alarm-set').addEventListener('click', () => {
+            const timeInput = document.getElementById('alarm-time').value;
+            if (timeInput) {
+                alarmTime = timeInput;
+                document.getElementById('alarm-status').textContent = `已设置: ${timeInput}`;
+
+                if (alarmInterval) clearInterval(alarmInterval);
+                alarmInterval = setInterval(checkAlarm, 1000);
+            }
+        });
+
+        function checkAlarm() {
+            if (!alarmTime) return;
+
+            const now = new Date();
+            const currentTime = now.toTimeString().substring(0, 5); // HH:MM format
+
+            if (currentTime === alarmTime) {
+                alert('闹钟响了！');
+                clearInterval(alarmInterval);
+                alarmTime = null;
+                document.getElementById('alarm-status').textContent = '未设置';
+            }
+        }
+
+        // Text tools functionality
+        function updateTextStats() {
+            const text = document.getElementById('text-input').value;
+            const charCount = text.length;
+            const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            const lineCount = text.split('\n').length;
+
+            document.getElementById('char-count').textContent = charCount;
+            document.getElementById('word-count').textContent = wordCount;
+            document.getElementById('line-count').textContent = lineCount;
+        }
+
+        function convertToUpper() {
+            const textarea = document.getElementById('format-input');
+            textarea.value = textarea.value.toUpperCase();
+        }
+
+        function convertToLower() {
+            const textarea = document.getElementById('format-input');
+            textarea.value = textarea.value.toLowerCase();
+        }
+
+        function convertToTitle() {
+            const textarea = document.getElementById('format-input');
+            textarea.value = textarea.value.replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function copyFormattedText() {
+            const textarea = document.getElementById('format-input');
+            textarea.select();
+            document.execCommand('copy');
+            alert('文本已复制到剪贴板！');
+        }
+
+        // Drawing tool functionality
+        let canvas, ctx;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        function initDrawingTool() {
+            canvas = document.getElementById('drawing-canvas');
+            if (!canvas) return;
+
+            ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            // Set initial canvas size
+            resizeCanvas();
+
+            // Drawing event listeners for mouse
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            // Touch support for mobile
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+            // Brush size display update
+            const brushSizeInput = document.getElementById('brush-size');
+            if (brushSizeInput) {
+                brushSizeInput.addEventListener('input', (e) => {
+                    document.getElementById('brush-size-display').textContent = e.target.value;
+                });
+            }
+
+            // Clear canvas button
+            const clearBtn = document.getElementById('clear-canvas');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                });
+            }
+
+            // Save canvas button
+            const saveBtn = document.getElementById('save-canvas');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', () => {
+                    const link = document.createElement('a');
+                    link.download = 'drawing.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                });
+            }
+
+            // Set initial brush properties
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+        }
+
+        // Resize canvas to match display size
+        function resizeCanvas() {
+            if (!canvas) return;
+
+            const rect = canvas.getBoundingClientBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+
+            // Set actual canvas size in memory (scaled for retina displays)
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+
+            // Scale the drawing context so everything draws at the correct size
+            ctx.scale(dpr, dpr);
+
+            // Set display size (CSS size)
+            canvas.style.width = rect.width + 'px';
+            canvas.style.height = rect.height + 'px';
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientBoundingClientRect();
+            lastX = e.clientX - rect.left;
+            lastY = e.clientY - rect.top;
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            const rect = canvas.getBoundingClientBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            drawLine(lastX, lastY, x, y);
+            lastX = x;
+            lastY = y;
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientBoundingClientRect();
+            lastX = touch.clientX - rect.left;
+            lastY = touch.clientY - rect.top;
+            isDrawing = true;
+        }
+
+        function handleTouchMove(e) {
+            e.preventDefault();
+            if (!isDrawing) return;
+
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            drawLine(lastX, lastY, x, y);
+            lastX = x;
+            lastY = y;
+        }
+
+        function handleTouchEnd(e) {
+            e.preventDefault();
+            isDrawing = false;
+        }
+
+        function drawLine(x1, y1, x2, y2) {
+            if (!ctx) return;
+
+            const brushColor = document.getElementById('brush-color')?.value || '#000000';
+            const brushSize = parseInt(document.getElementById('brush-size')?.value) || 5;
+
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = brushColor;
+            ctx.lineWidth = brushSize;
+            ctx.stroke();
+        }
+
+        // Initialize drawing tool when tool is selected
+        const drawingToolBtn = document.getElementById('tool-drawing');
+        if (drawingToolBtn) {
+            drawingToolBtn.addEventListener('click', () => {
+                // Small delay to ensure DOM is ready
+                setTimeout(initDrawingTool, 100);
+            });
+        }
+
+        // Also initialize if page loads with drawing tool active
+        document.addEventListener('DOMContentLoaded', () => {
+            const drawingPanel = document.getElementById('tool-drawing-panel');
+            if (drawingPanel && !drawingPanel.classList.contains('hidden')) {
+                setTimeout(initDrawingTool, 100);
+            }
+        });
+
+        // Image tools functionality
+        let currentImage = null;
+
+        document.getElementById('image-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        currentImage = img;
+                        document.getElementById('preview-img').src = e.target.result;
+                        document.getElementById('image-preview').classList.remove('hidden');
+
+                        // Update image info
+                        document.getElementById('file-size').textContent = (file.size / 1024).toFixed(1);
+                        document.getElementById('image-size').textContent = `${img.width}x${img.height}`;
+                        document.getElementById('image-format').textContent = file.type.split('/')[1].toUpperCase();
+                        document.getElementById('image-info').classList.remove('hidden');
+
+                        // Enable buttons
+                        document.getElementById('compress-image').disabled = false;
+                        document.getElementById('convert-format').disabled = false;
+                        document.getElementById('download-image').disabled = false;
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Code tools functionality
+        document.getElementById('code-input').addEventListener('input', updateCodeStats);
+
+        function updateCodeStats() {
+            const code = document.getElementById('code-input').value;
+            const charCount = code.length;
+            const lineCount = code.split('\n').length;
+
+            document.getElementById('code-char-count').textContent = charCount;
+            document.getElementById('code-line-count').textContent = lineCount;
+        }
+
+        // Format code (basic formatting)
+        document.getElementById('format-code').addEventListener('click', () => {
+            const code = document.getElementById('code-input').value;
+            const language = document.getElementById('code-language').value;
+
+            try {
+                let formatted = code;
+                if (language === 'json') {
+                    formatted = JSON.stringify(JSON.parse(code), null, 2);
+                } else if (language === 'javascript' || language === 'html' || language === 'css') {
+                    // Basic formatting - add line breaks and indentation
+                    formatted = code
+                        .replace(/;/g, ';\n')
+                        .replace(/{/g, '{\n    ')
+                        .replace(/}/g, '\n}\n')
+                        .replace(/,/g, ',\n')
+                        .split('\n')
+                        .map(line => line.trim())
+                        .join('\n');
+                }
+                document.getElementById('code-input').value = formatted;
+                updateCodeStats();
+            } catch (e) {
+                alert('格式化失败，请检查代码语法');
+            }
+        });
+
+        // Minify code (remove extra whitespace)
+        document.getElementById('minify-code').addEventListener('click', () => {
+            const code = document.getElementById('code-input').value;
+            const language = document.getElementById('code-language').value;
+
+            try {
+                let minified = code;
+                if (language === 'json') {
+                    minified = JSON.stringify(JSON.parse(code));
+                } else {
+                    // Basic minification - remove extra whitespace
+                    minified = code
+                        .replace(/\s+/g, ' ')
+                        .replace(/\s*([{}();:,])\s*/g, '$1')
+                        .trim();
+                }
+                document.getElementById('code-input').value = minified;
+                updateCodeStats();
+            } catch (e) {
+                alert('压缩失败，请检查代码语法');
+            }
+        });
+
+        // Copy code
+        document.getElementById('copy-code').addEventListener('click', () => {
+            const textarea = document.getElementById('code-input');
+            textarea.select();
+            document.execCommand('copy');
+            alert('代码已复制到剪贴板！');
+        });
+
+        // Clear code
+        document.getElementById('clear-code').addEventListener('click', () => {
+            document.getElementById('code-input').value = '';
+            updateCodeStats();
         });
     </script>
 </body>
